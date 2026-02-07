@@ -25,6 +25,16 @@ const normalize = (p) => {
 export default function App() {
   const [route, setRoute] = useState(normalize(window.location.pathname))
 
+  // Normalize artwork paths stored in DB that still reference the old
+  // `/assets/...` public directory. Vite's `publicDir: 'assets'` serves
+  // those files at root (e.g. `/artwork/default.png`), so strip the
+  // `/assets/` prefix when present.
+  const normalizeAsset = (p) => {
+    if (!p) return p
+    if (typeof p !== 'string') return p
+    return p.replace(/^\/assets\//, '/')
+  }
+
   // fetch catalogue from Convex
   const dbTracks = useQuery('functions/tracks:listTracks') || []
   const dbAlbums = useQuery('functions/albums:listAlbums') || []
@@ -35,7 +45,7 @@ export default function App() {
       id: t._id || t.id,
       title: t.title,
       artist: t.artist || 'Nobz',
-      artwork: t.artwork || '/artwork/default.png',
+      artwork: normalizeAsset(t.artwork) || '/artwork/default.png',
       src: t.src,
       duration: t.duration || '0:00',
       description: t.description,
@@ -46,7 +56,7 @@ export default function App() {
     id: a._id || a.id,
     title: a.title,
     artist: a.artist || 'Nobz',
-    artwork: a.artwork || '/artwork/default.png',
+    artwork: normalizeAsset(a.artwork) || '/artwork/default.png',
     description: a.description,
     tracks: dbTracks
       .filter(t => (t.albumId === (a._id || a.id)))
@@ -59,7 +69,7 @@ export default function App() {
       id: t._id || t.id,
       title: t.title,
       artist: t.artist || 'Nobz',
-      artwork: t.artwork || '/artwork/default.png',
+      artwork: normalizeAsset(t.artwork) || '/artwork/default.png',
       src: t.src,
       duration: t.duration || '0:00',
       description: t.description,
@@ -72,7 +82,7 @@ export default function App() {
       id: t._id || t.id,
       title: t.title,
       artist: t.artist || 'Nobz',
-      artwork: t.artwork || (album ? album.artwork : '/artwork/default.png'),
+      artwork: normalizeAsset(t.artwork) || (album ? album.artwork : '/artwork/default.png'),
       src: t.src,
       duration: t.duration || '0:00',
       description: t.description,
@@ -91,7 +101,7 @@ export default function App() {
     id: latestTrackRaw._id || latestTrackRaw.id,
     title: latestTrackRaw.title,
     artist: latestTrackRaw.artist || 'Nobz',
-    artwork: latestTrackRaw.artwork || '/artwork/default.png',
+    artwork: normalizeAsset(latestTrackRaw.artwork) || '/artwork/default.png',
     src: latestTrackRaw.src,
     duration: latestTrackRaw.duration || '0:00',
     description: latestTrackRaw.description,
@@ -107,7 +117,7 @@ export default function App() {
     id: latestAlbumRaw._id || latestAlbumRaw.id,
     title: latestAlbumRaw.title,
     artist: latestAlbumRaw.artist || 'Nobz',
-    artwork: latestAlbumRaw.artwork || '/artwork/default.png',
+    artwork: normalizeAsset(latestAlbumRaw.artwork) || '/artwork/default.png',
     description: latestAlbumRaw.description,
     tracks: dbTracks.filter(t => (t.albumId === (latestAlbumRaw._id || latestAlbumRaw.id))).map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist }))
   }) : (albums[0] || null)

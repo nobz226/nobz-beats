@@ -1,6 +1,7 @@
 :root {
   --dark: #1c1c1c;
   --white: #c8c8c8;
+  --grey: rgba(255,255,255,0.03);
   --logo-size: 256px;
   --logo-gap: 16px;
 
@@ -397,7 +398,7 @@ body {
 .latest-section {
   position: fixed;
   left: calc(var(--logo-size) + var(--logo-gap));
-  top: 280px;
+  top: 230px;
   z-index: 1000;
   color: var(--white);
   max-width: calc(100% - (var(--logo-size) + var(--logo-gap) + 32px));
@@ -563,7 +564,9 @@ body {
 .player-progress input[type="range"] { flex: 1; }
 
 .player-right { gap: 8px; min-width: 80px; justify-content: flex-end }
-.volume input[type="range"] { width: 100px }
+.volume input[type="range"] {
+  accent-color: var(--grey); /* or any color/variable */
+}
 
 /* Mobile adjustments */
 @media (max-width: 520px) {

@@ -36,6 +36,13 @@ body {
   overflow: hidden;
   background: transparent;
   pointer-events: auto;
+  cursor: pointer;
+}
+
+.logo-container:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
 /* Ensure the SVG or image scales to fit the container */
@@ -211,11 +218,17 @@ body {
   to { opacity: 1; transform: translateY(-50%) rotate(90deg); }
 }
 
+@keyframes section-fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .site-nav a,
   .logo-glitch,
   .vertical-title,
+  .latest-section,
   .logo-glitch img,
   .glitch-slice {
     animation: none;
@@ -236,3 +249,48 @@ body {
     font-size: 14px;
   }
 }
+
+.cutive-mono-regular {
+  font-family: "Cutive Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.cal-sans-title {
+  font-family: "Cal Sans", system-ui;
+  font-weight: 700;
+  font-size: 28px;
+  margin: 0 0 8px 0;
+}
+
+.latest-section {
+  position: fixed;
+  left: calc(var(--logo-size) + var(--logo-gap));
+  top: 280px;
+  z-index: 1000;
+  color: var(--white);
+  max-width: calc(100% - (var(--logo-size) + var(--logo-gap) + 32px));
+
+  /* entry: fade in last after logo, title and nav animations */
+  opacity: 0;
+  transform: translateY(8px);
+  animation: section-fade var(--title-fade) cubic-bezier(.22,.8,.25,1) forwards;
+  animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .72s);
+}
+
+.latest-artwork {
+  width: 240px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.latest-meta {
+  font-family: "Cutive Mono", monospace;
+}
+
+@media (max-width: 420px) {
+  .latest-section { left: calc(var(--logo-size) + 8px); top: 120px; }
+  .latest-artwork { width: 120px; height: 120px; }
+} 

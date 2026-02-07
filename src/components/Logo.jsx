@@ -149,8 +149,12 @@ export default function Logo() {
     return () => { instance.destroy(); window.removeEventListener('resize', setImgAttrs) }
   }, [])
 
+  const navigateHome = () => { history.pushState(null, '', '/latest'); window.dispatchEvent(new PopStateEvent('popstate')) }
+
+  const onKeyDown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateHome() } }
+
   return (
-    <div className="logo-container" aria-label="Site logo">
+    <div className="logo-container" aria-label="Site logo" role="link" tabIndex={0} onClick={navigateHome} onKeyDown={onKeyDown}>
       <div ref={rootRef} className="logo-glitch" role="img" aria-label="Site logo">
         <img className="logo-base" src="/assets/logo/logoSVG.svg" alt="Site logo" />
         <img className="logo-r" src="/assets/logo/logoSVG.svg" aria-hidden="true" />
@@ -160,4 +164,4 @@ export default function Logo() {
       </div>
     </div>
   )
-}
+} 

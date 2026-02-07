@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 export default function Nav() {
   const navRef = useRef(null)
+  const [open, setOpen] = useState(false)
 
   const onClick = (e) => {
     const anchor = e.target.closest && e.target.closest('a')
@@ -13,6 +14,8 @@ export default function Nav() {
       history.pushState(null, '', href)
       // notify the app that navigation happened
       window.dispatchEvent(new PopStateEvent('popstate'))
+      // close mobile menu after navigation
+      setOpen(false)
     }
   }
 
@@ -65,13 +68,24 @@ export default function Nav() {
   }, [])
 
   return (
-    <nav ref={navRef} className="site-nav" aria-label="Primary navigation" onClick={onClick}>
-      <a href="/singles">&gt;Singles</a>
-      <a href="/albums">&gt;Albums</a>
-      <a href="/remixes">&gt;Remixes</a>
-      <a href="/alltracks">&gt;AllTracks</a>
-      <a href="/about">&gt;About</a>
-      <a href="/connect">&gt;Connect</a>
+    <nav ref={navRef} className={`site-nav ${open ? 'open' : ''}`} aria-label="Primary navigation">
+      <button
+        className="nav-toggle"
+        aria-label={open ? 'Close menu' : 'Open menu'}
+        aria-expanded={open}
+        onClick={() => setOpen(o => !o)}
+      >
+        ☰
+      </button>
+
+      <div className={`nav-links ${open ? 'open' : ''}`} onClick={onClick}>
+        <a href="/singles">&gt;Singles</a>
+        <a href="/albums">&gt;Albums</a>
+        <a href="/remixes">&gt;Remixes</a>
+        <a href="/alltracks">&gt;AllTracks</a>
+        <a href="/about">&gt;About</a>
+        <a href="/connect">&gt;Connect</a>
+      </div>
     </nav>
   )
 }  

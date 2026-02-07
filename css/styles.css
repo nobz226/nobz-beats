@@ -17,6 +17,47 @@
   --playlist-gap: .08s;
 }
 
+/* Mobile: make audio player span full viewport width */
+@media (max-width: 720px) {
+  .audio-player {
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 8px calc(env(safe-area-inset-right, 8px));
+    box-sizing: border-box;
+  }
+
+  .audio-player-inner {
+    max-width: 100%;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Extend full-width audio player to larger mobile/tablet viewports */
+@media (max-width: 900px) {
+  .audio-player {
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 8px env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
+    box-sizing: border-box;
+  }
+
+  .audio-player-inner {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+}
+
+
 /* Small screens: reduce logo size */
 @media (max-width: 320px) {
   :root {
@@ -191,6 +232,176 @@ body {
   animation: nav-slide .6s cubic-bezier(.22,.8,.25,1) forwards;
   will-change: transform, opacity;
 } 
+
+/* Mobile hamburger toggle */
+.nav-toggle {
+  display: block;
+  background: rgba(255,255,255,0.03);
+  border: none;
+  color: var(--white);
+  font-size: 26px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1102;
+}
+
+.nav-links {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+@media (max-width: 720px) {
+  .nav-toggle { display: block }
+  .site-nav { right: 12px; top: 12px; left: auto; }
+  .nav-links { display: none; position: absolute; top: 56px; right: 12px; flex-direction: column; width: calc(100% - (var(--logo-size) + 32px)); max-width: 360px; background: rgba(28,28,28,0.98); padding: 8px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+  .nav-links.open { display: flex }
+  .site-nav a { font-size: 18px; padding: 10px 12px; display: block }
+}
+
+/* hide hamburger on larger screens */
+@media (min-width: 901px) {
+  .nav-toggle { display: none }
+}
+
+/* Improve layout on very small phones */
+@media (max-width: 420px) {
+  .nav-links { right: 8px; width: calc(100% - (var(--logo-size) + 20px)); }
+  .site-nav a { font-size: 16px }
+}
+
+/* Mobile content adjustments */
+@media (max-width: 720px) {
+  .latest-section { left: calc(var(--logo-size) + 8px); top: 120px; padding: 12px; max-width: calc(100% - (var(--logo-size) + 24px)); }
+  .latest-artwork { width: 220px; height: 220px }
+  .latest-grid { gap: 20px }
+  .latest-item { width: 100% }
+  .album-left { width: 100% }
+  .playlist { display: none }
+}
+
+@media (max-width: 420px) {
+  .latest-artwork { width: 120px; height: 120px }
+  .latest-description { max-width: 180px }
+}
+
+/* Responsive overrides for small tablets and phones */
+@media (max-width: 900px) {
+  :root { --logo-size: 88px; --logo-gap: 12px; }
+
+  .logo-container {
+    position: relative;
+    width: var(--logo-size);
+    height: var(--logo-size);
+    top: 8px;
+    left: 8px;
+    margin: 0 8px 8px 8px;
+  }
+
+  .vertical-title { display: none }
+
+  .site-nav {
+    position: relative;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px calc(var(--logo-size) + var(--logo-gap));
+    width: 100%;
+  }
+
+  .nav-toggle { display: block }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: calc(var(--logo-size) + 12px);
+    right: 8px;
+    left: 8px;
+    flex-direction: column;
+    width: auto;
+    background: rgba(28,28,28,0.98);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    z-index: 1005;
+  }
+  .nav-links.open { display: flex }
+
+  .site-nav a { font-size: 18px }
+
+  .latest-section {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin-top: 8px;
+    padding: 12px;
+    max-width: calc(100% - 24px);
+  }
+
+  .main-content { padding-top: 8px; padding-bottom: calc(72px + 24px); }
+
+  .latest-grid { flex-direction: column; gap: 18px; align-items: stretch }
+  .latest-artwork { width: 100%; max-width: 320px; height: auto }
+  .album-left { width: 100% }
+  .album-tracks.expanded { max-height: 360px; overflow: auto }
+
+  .alltracks-list { max-height: 420px }
+  .playlist { display: none }
+
+  .btn { padding: 10px 12px; font-size: 16px }
+
+  .audio-player { left: 0; right: 0; padding: 8px; bottom: 0 }
+  .audio-player-inner { max-width: 100%; padding: 8px 12px }
+}
+
+/* Make logo slightly larger on typical mobile viewports */
+@media (max-width: 720px) {
+  :root { --logo-size: 110px; }
+
+  /* Audio player: allow wrapping and fluid progress bar */
+  .audio-player {
+    right: 0;
+    padding: 8px 10px;
+  }
+
+  .audio-player-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+    max-width: calc(100% - 20px);
+  }
+
+  .player-left, .player-center, .player-right {
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: center;
+  }
+
+  .player-left { order: 1; gap: 8px; }
+  .player-center { order: 2; width: 100%; justify-content: center; }
+  .player-right { order: 3; justify-content: flex-end; }
+
+  .player-progress { width: 100%; min-width: 0; order: 2; }
+  .player-progress input[type="range"] { flex: 1; min-width: 0 }
+
+  .player-artwork { width: 48px; height: 48px }
+  .player-title { font-size: 14px }
+  .player-artist { display: none }
+}
+
+@media (max-width: 420px) {
+  :root { --logo-size: 64px }
+  .latest-artwork { max-width: 200px }
+  .site-nav a { font-size: 16px }
+  .btn { font-size: 14px }
+  .latest-section { padding: 8px }
+}
 
 .site-nav a:hover,
 .site-nav a:focus {
@@ -372,7 +583,7 @@ body {
     animation: none;
     opacity: 1;
     transform: none;
-    transition: none !important;
+    transition: none;
   }
 }
 
@@ -470,7 +681,12 @@ body {
 @media (max-width: 720px) {
   .album-with-tracks { flex-direction: column; }
   .album-left { width: 100%; }
-  .album-tracks { width: 100%; max-height: none; opacity: 1; transform: none }
+  /* Keep album tracks collapsed by default on small screens; expand only when `.expanded` is set */
+  .album-tracks { width: 100%; max-height: 0; overflow: hidden; opacity: 0; transform: translateX(-12px); transition: max-height .36s cubic-bezier(.22,.8,.25,1), opacity .28s ease, transform .36s cubic-bezier(.22,.8,.25,1); }
+  .album-tracks.expanded { max-height: 360px; overflow: auto; opacity: 1; transform: translateX(0); }
+
+  /* Center album artwork and meta on mobile for better layout */
+  .album-left { display: flex; flex-direction: column; align-items: center; text-align: center; }
 }
 .latest-meta {
   font-family: "Cutive Mono", monospace;
@@ -598,5 +814,53 @@ body {
 .muted { color: rgba(255,255,255,0.6); font-size: 13px }
 
 /* visually hidden helper */
-.visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
+.visually-hidden { position: absolute; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
+
+/* Ensure hamburger toggle is visible and fixed on small screens */
+@media (max-width: 900px) {
+  .site-nav .nav-toggle { position: fixed; top: 12px; right: 12px; z-index: 1300; display: block }
+  .site-nav .nav-links { top: calc(12px + 56px); right: 8px; left: 8px }
+}
+
+
+/* Mobile-only: show a compact vertical title for phones */
+@media (max-width: 720px) {
+  body .vertical-title {
+    display: block;
+    font-size: 48px;
+    left: calc(var(--logo-size) - 20px);
+    top: 35%;
+    transform: translateY(calc(-50% - 6px)) rotate(90deg);
+    opacity: 1;
+    pointer-events: none;
+    padding: 2px 4px;
+    z-index: 1200;
+  }
+}
+
+
+/* Final override: ensure audio player spans full viewport on mobile/tablet
+   Placed at the end so it overrides earlier desktop-oriented rules. */
+@media (max-width: 900px) {
+  .audio-player {
+    left: 0;
+    right: 0;
+    width: 100vw;
+    max-width: 100vw;
+    transform: none;
+    padding: 0 env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
+    box-sizing: border-box;
+    justify-content: center;
+  }
+
+  .audio-player-inner {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0; /* edge-to-edge look on mobile */
+    box-shadow: none; /* optional: remove shadow for full-width aesthetic */
+    padding: 8px 12px;
+  }
+}
+
 

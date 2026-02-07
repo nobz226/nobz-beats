@@ -438,22 +438,30 @@ body {
   width: 360px; /* make items larger and consistent */
 }
 
+.latest-item.album-with-tracks { width: 100%; max-width: none; align-items: stretch; }
 /* Albums with tracklist: show tracks on the right */
 .album-with-tracks {
   flex-direction: row;
   align-items: flex-start;
   gap: 24px;
+  width: 100%;
+  max-width: none; /* allow tracks to be visible to the right */
 }
 
 .album-left { width: 360px; }
-.album-tracks { flex: 1; }
+.album-tracks { flex: 1; overflow: hidden; max-height: 0; opacity: 0; transform: translateX(-12px); transition: max-height .36s cubic-bezier(.22,.8,.25,1), opacity .28s ease, transform .36s cubic-bezier(.22,.8,.25,1); }
+.album-tracks.expanded { max-height: 1600px; opacity: 1; transform: translateX(0); }
 .album-track-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
 .album-track-actions { display: flex; gap: 8px; align-items: center }
+
+/* make artwork clickable */
+.album-left .latest-artwork { cursor: pointer }
+.album-left .latest-artwork:focus { outline: 2px solid #ffffff; outline-offset: 4px }
 
 @media (max-width: 720px) {
   .album-with-tracks { flex-direction: column; }
   .album-left { width: 100%; }
-  .album-tracks { width: 100%; }
+  .album-tracks { width: 100%; max-height: none; opacity: 1; transform: none }
 }
 .latest-meta {
   font-family: "Cutive Mono", monospace;

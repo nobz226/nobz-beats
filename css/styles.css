@@ -1,0 +1,238 @@
+:root {
+  --dark: #1c1c1c;
+  --white: #c8c8c8;
+  --logo-size: 256px;
+  --logo-gap: 16px;
+
+  /* sequencing timers */
+  --logo-fade: .6s;
+  --title-fade: .6s;
+  --title-gap: .08s;
+}
+
+/* Small screens: reduce logo size */
+@media (max-width: 320px) {
+  :root {
+    --logo-size: 128px;
+  }
+}
+
+body {
+  background-color: var(--dark);
+}
+
+
+/* Logo container — fixed top-left */
+.logo-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--logo-size);
+  height: var(--logo-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* Ensure the SVG or image scales to fit the container */
+.logo-container img,
+.logo-container svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* DOM-based RGB glitch layers applied to the logo (no Pixi) */
+.logo-glitch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* don't block interaction */
+  overflow: visible;
+
+  /* entry animation: fade in from current position with a gentle scale pop */
+  opacity: 0;
+  transform: scale(.96);
+  transform-origin: center center;
+  animation: logo-fade var(--logo-fade) cubic-bezier(.22,.8,.25,1) forwards;
+}
+
+.logo-glitch img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transform-origin: center center;
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+}
+
+.logo-base { z-index: 1; }
+.logo-r { z-index: 2; filter: url(#redify); mix-blend-mode: screen; }
+.logo-g { z-index: 3; filter: url(#greenify); mix-blend-mode: screen; }
+.logo-b { z-index: 4; filter: url(#blueify); mix-blend-mode: screen; }
+
+/* glitch slices container + slices */
+.glitch-slices {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.glitch-slice {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  transition: transform .36s cubic-bezier(.22,.8,.25,1), opacity .28s ease;
+}
+
+.glitch-slice img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* size is set dynamically to match the displayed logo to avoid full-image duplicates */
+  width: auto;
+  height: auto;
+  object-fit: none;
+}
+
+
+
+
+/* Vertical page title — left edge */
+.vertical-title {
+  position: fixed;
+  left: 125px;
+  top: 30%;
+  transform-origin: left center;
+  white-space: nowrap;
+  font-size: 80px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  z-index: 1001;
+  pointer-events: none;
+  margin: 0;
+  padding: 4px;
+  font-family: "Rubik 80s Fade", system-ui;
+
+  /* start slightly above and invisible, then drop into place */
+  opacity: 0;
+  transform: translateY(calc(-50% - 18px)) rotate(90deg);
+  animation: title-drop var(--title-fade) cubic-bezier(.22,.8,.25,1) forwards;
+  animation-delay: calc(var(--logo-fade) + var(--title-gap));
+
+  /* subtle vertical text gradient */
+  background: linear-gradient(to bottom, #c8c8c8, #1c1c1c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; /* fallback removed in favor of gradient */
+  -webkit-text-fill-color: transparent;
+}
+
+/* Small screens: reduce size */
+@media (max-width: 420px) {
+  .vertical-title {
+    font-size: 14px;
+    left: 6px;
+  }
+}
+
+/* Site navigation — placed to the right of the logo */
+.site-nav {
+  position: fixed;
+  top: 75px;
+  left: calc(var(--logo-size) + var(--logo-gap));
+  display: flex;
+  gap: 16px;
+  z-index: 1002;
+}
+
+.site-nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-family: "Doto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 24px;
+  font-variation-settings: "ROND" 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color .12s ease, color .12s ease, transform .45s cubic-bezier(.22,.8,.25,1), opacity .45s cubic-bezier(.22,.8,.25,1);
+
+  /* initial state for entry animation */
+  opacity: 0;
+  transform: translateX(-12px);
+  /* slower, smoother animation */
+  animation: nav-slide .6s cubic-bezier(.22,.8,.25,1) forwards;
+  will-change: transform, opacity;
+} 
+
+.site-nav a:hover,
+.site-nav a:focus {
+  background: rgba(255,255,255,0.08);
+  outline: none;
+}
+
+.site-nav a:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Staggered animation delays for nav items */
+.site-nav a:nth-child(1) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .12s); }
+.site-nav a:nth-child(2) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .24s); }
+.site-nav a:nth-child(3) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .36s); }
+.site-nav a:nth-child(4) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .48s); }
+.site-nav a:nth-child(5) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .60s); }
+
+@keyframes nav-slide {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes logo-fade {
+  from { opacity: 0; transform: scale(.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes title-drop {
+  from { opacity: 0; transform: translateY(calc(-50% - 18px)) rotate(90deg); }
+  to { opacity: 1; transform: translateY(-50%) rotate(90deg); }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .site-nav a,
+  .logo-glitch,
+  .vertical-title,
+  .logo-glitch img,
+  .glitch-slice {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-nav {
+    gap: 8px;
+    left: calc(var(--logo-size) + 8px);
+    top: 12px;
+  }
+  .site-nav a {
+    padding: 6px 8px;
+    font-size: 14px;
+  }
+}

@@ -528,6 +528,11 @@ body {
 .playlist-title { font-weight: 600; font-size: 0.875rem; }
 .playlist-meta { font-size: 0.75rem; opacity: 0.9; }
 
+/* Use the same fonts as album metadata and titles */
+.playlist, .playlist-item { font-family: "Cutive Mono", monospace; }
+.playlist-title { font-family: "Cal Sans", system-ui; font-weight: 600; font-size: 0.875rem; }
+.playlist-meta { font-family: "Cutive Mono", monospace; }
+
 @media (max-width: 45rem) {
   .playlist { display: none; }
 } 

@@ -67,8 +67,8 @@ export default function AddTrack() {
         // No artwork provided but track is part of an album -> use album artwork
         const alb = albums.find(a => (a._id || a.id) === albumId)
         artworkUrl = alb?.artwork || '/assets/artwork/default.png'
-      } else if (type === 'single') {
-        // Single with no artwork -> use default
+      } else if (type === 'single' || type === 'remix') {
+        // Single or remix with no artwork -> use default
         artworkUrl = '/assets/artwork/default.png'
       }
 
@@ -99,6 +99,7 @@ export default function AddTrack() {
         <label>Type<select value={type} onChange={e => setType(e.target.value)}>
           <option value="single">Single</option>
           <option value="album">Album track</option>
+          <option value="remix">Remix</option>
         </select></label>
         {type === 'album' && (
           <label>Album<select value={albumId} onChange={e => setAlbumId(e.target.value)}>

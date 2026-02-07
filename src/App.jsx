@@ -5,6 +5,7 @@ import Nav from './components/Nav'
 import Title from './components/Title'
 import Latest from './components/Latest'
 import Singles from './components/Singles'
+import Remixes from './components/Remixes'
 import Albums from './components/Albums'
 import AllTracks from './components/AllTracks'
 import About from './components/About'
@@ -29,11 +30,11 @@ export default function App() {
   const dbAlbums = useQuery('functions/albums:listAlbums') || []
 
   const singles = dbTracks
-    .filter(t => !t.albumId)
+    .filter(t => !t.albumId && ((t.type || '').toString().toLowerCase() !== 'remix'))
     .map(t => ({
       id: t._id || t.id,
       title: t.title,
-      artist: t.artist || 'NOBZ>BEATS',
+      artist: t.artist || 'Nobz',
       artwork: t.artwork || '/assets/artwork/default.png',
       src: t.src,
       duration: t.duration || '0:00',
@@ -44,13 +45,72 @@ export default function App() {
   const albums = dbAlbums.map(a => ({
     id: a._id || a.id,
     title: a.title,
-    artist: a.artist || 'NOBZ>BEATS',
+    artist: a.artist || 'Nobz',
     artwork: a.artwork || '/assets/artwork/default.png',
     description: a.description,
     tracks: dbTracks
       .filter(t => (t.albumId === (a._id || a.id)))
       .map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist }))
   }))
+
+  const remixes = dbTracks
+    .filter(t => (t.type === 'remix'))
+    .map(t => ({
+      id: t._id || t.id,
+      title: t.title,
+      artist: t.artist || 'Nobz',
+      artwork: t.artwork || '/assets/artwork/default.png',
+      src: t.src,
+      duration: t.duration || '0:00',
+      description: t.description,
+      type: t.type || 'Remix'
+    }))
+
+  const allTracks = dbTracks.map(t => {
+    const album = dbAlbums.find(a => (a._id || a.id) === t.albumId)
+    return {
+      id: t._id || t.id,
+      title: t.title,
+      artist: t.artist || 'Nobz',
+      artwork: t.artwork || (album ? album.artwork : '/assets/artwork/default.png'),
+      src: t.src,
+      duration: t.duration || '0:00',
+      description: t.description,
+      album: album ? album.title : undefined,
+      type: t.type || 'single'
+    }
+  })
+
+  // pick latest track and latest album by createdAt timestamp
+  const latestTrackRaw = dbTracks.reduce((best, t) => {
+    if (!best) return t
+    return (t.createdAt || 0) > (best.createdAt || 0) ? t : best
+  }, null)
+
+  const latestTrack = latestTrackRaw ? {
+    id: latestTrackRaw._id || latestTrackRaw.id,
+    title: latestTrackRaw.title,
+    artist: latestTrackRaw.artist || 'NOBZ>BEATS',
+    artwork: latestTrackRaw.artwork || '/assets/artwork/default.png',
+    src: latestTrackRaw.src,
+    duration: latestTrackRaw.duration || '0:00',
+    description: latestTrackRaw.description,
+    type: latestTrackRaw.type || 'Single'
+  } : (singles[0] || null)
+
+  const latestAlbumRaw = dbAlbums.reduce((best, a) => {
+    if (!best) return a
+    return (a.createdAt || 0) > (best.createdAt || 0) ? a : best
+  }, null)
+
+  const latestAlbum = latestAlbumRaw ? (albums.find(x => x.id === (latestAlbumRaw._id || latestAlbumRaw.id)) || {
+    id: latestAlbumRaw._id || latestAlbumRaw.id,
+    title: latestAlbumRaw.title,
+    artist: latestAlbumRaw.artist || 'NOBZ>BEATS',
+    artwork: latestAlbumRaw.artwork || '/assets/artwork/default.png',
+    description: latestAlbumRaw.description,
+    tracks: dbTracks.filter(t => (t.albumId === (latestAlbumRaw._id || latestAlbumRaw.id))).map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist }))
+  }) : (albums[0] || null)
 
   // app state: playlist and current track
   const [playlist, setPlaylist] = useState([])
@@ -88,6 +148,26 @@ export default function App() {
     setPlaylist(prev => {
       if (prev.find(p => p.id === t.id)) return prev
       return [...prev, t]
+    })
+  }
+
+  // Play an album: replace playlist with album's tracks and start with the first
+  const playAlbum = (album) => {
+    if (!album || !album.tracks || album.tracks.length === 0) return
+    const items = album.tracks.map(t => ({ ...t, artwork: t.artwork || album.artwork, album: album.title }))
+    setPlaylist(items)
+    setCurrentTrack(items[0])
+  }
+
+  // Add album tracks to the current playlist without clearing or autoplay
+  const addAlbumToPlaylist = (album) => {
+    if (!album || !album.tracks || album.tracks.length === 0) return
+    setPlaylist(prev => {
+      const existingIds = new Set(prev.map(p => p.id))
+      const toAdd = album.tracks
+        .map(t => ({ ...t, artwork: t.artwork || album.artwork, album: album.title }))
+        .filter(t => !existingIds.has(t.id))
+      return [...prev, ...toAdd]
     })
   }
 
@@ -135,10 +215,11 @@ export default function App() {
       <Nav />
       <Title />
       <main className="main-content">
-        {route === '/latest' && <Latest single={singles[0]} album={albums[0]} onPlay={playTrack} onAdd={addToPlaylist} />}
+        {route === '/latest' && <Latest single={latestTrack} album={latestAlbum} onPlay={playTrack} onAdd={addToPlaylist} onPlayAlbum={playAlbum} onAddAlbum={addAlbumToPlaylist} onPlayTrack={playTrack} onAddTrack={addToPlaylist} />}
         {route === '/singles' && <Singles tracks={singles} onPlay={playTrack} onAdd={addToPlaylist} />}
-        {route === '/albums' && <Albums tracks={albums} onPlay={playTrack} onAdd={addToPlaylist} />}
-        {route === '/alltracks' && <AllTracks singles={singles} albums={albums} onPlay={playTrack} onAdd={addToPlaylist} currentTrackId={currentTrack?.id} />}
+        {route === '/remixes' && <Remixes tracks={remixes} onPlay={playTrack} onAdd={addToPlaylist} />}
+        {route === '/albums' && <Albums tracks={albums} onPlayAlbum={playAlbum} onAddAlbum={addAlbumToPlaylist} onPlayTrack={playTrack} onAddTrack={addToPlaylist} />}
+        {route === '/alltracks' && <AllTracks allTracks={allTracks} onPlay={playTrack} onAdd={addToPlaylist} currentTrackId={currentTrack?.id} />}
         {route === '/about' && <About />}
         {route === '/connect' && <Connect /> }
       </main>

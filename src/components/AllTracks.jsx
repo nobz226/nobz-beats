@@ -1,12 +1,7 @@
 import React from 'react'
 
-export default function AllTracks({ singles = [], albums = [], onPlay, onAdd, currentTrackId }) {
-  // flatten album tracks (include album artwork)
-  const albumTracks = albums.flatMap(a => (a.tracks || []).map(t => ({ ...t, album: a.title, artwork: a.artwork })))
-  const items = [
-    ...singles.map(s => ({ ...s, source: 'single' })),
-    ...albumTracks.map(t => ({ ...t, source: 'album' }))
-  ]
+export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackId }) {
+  const items = allTracks
 
   return (
     <section className="latest-section" aria-label="All tracks">

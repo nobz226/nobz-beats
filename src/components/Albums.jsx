@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export function AlbumItem({ track, onPlay, onAdd }) {
+export function AlbumItem({ track, onPlayAlbum, onAddAlbum, onPlayTrack, onAddTrack }) {
   const [expanded, setExpanded] = useState(false)
   const a = track || {
     title: 'Vol.1',
@@ -28,8 +28,8 @@ export function AlbumItem({ track, onPlay, onAdd }) {
           <div style={{ marginTop: 6 }}>{a.type}</div>
           <p className="latest-description" style={{ marginTop: 8 }}>{a.description}</p>
           <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center' }}>
-            <button className="btn" aria-label="Play album" onClick={() => onPlay && onPlay(a)}>▶</button>
-            <button className="btn" aria-label="Add album to playlist" onClick={() => onAdd && onAdd(a)}>＋</button>
+            <button className="btn" aria-label="Play album" onClick={() => onPlayAlbum && onPlayAlbum(a)}>▶</button>
+            <button className="btn" aria-label="Add album to playlist" onClick={() => onAddAlbum && onAddAlbum(a)}>＋</button>
           </div>
         </div>
       </div>
@@ -37,13 +37,13 @@ export function AlbumItem({ track, onPlay, onAdd }) {
       {a.tracks && a.tracks.length > 0 && (
         <div className={`album-tracks ${expanded ? 'expanded' : 'collapsed'}`} aria-hidden={!expanded}>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            {a.tracks.map(t => (
+                {a.tracks.map(t => (
               <li key={t.id} className="album-track-row">
                 <div className="playlist-title">{t.title}</div>
                 <div className="album-track-actions">
                   <div className="playlist-meta cutive-mono-regular">{t.duration}</div>
-                  <button className="btn" aria-label="Play track" onClick={() => onPlay && onPlay({ ...t, artwork: a.artwork })}>▶</button>
-                  <button className="btn" aria-label="Add to playlist" onClick={() => onAdd && onAdd({ ...t, artwork: a.artwork })}>＋</button>
+                  <button className="btn" aria-label="Play track" onClick={() => onPlayTrack && onPlayTrack({ ...t, artwork: a.artwork, album: a.title })}>▶</button>
+                  <button className="btn" aria-label="Add to playlist" onClick={() => onAddTrack && onAddTrack({ ...t, artwork: a.artwork, album: a.title })}>＋</button>
                 </div>
               </li>
             ))}
@@ -54,12 +54,21 @@ export function AlbumItem({ track, onPlay, onAdd }) {
   )
 }
 
-export default function Albums({ tracks = [], onPlay, onAdd }) {
+export default function Albums({ tracks = [], onPlayAlbum, onAddAlbum, onPlayTrack, onAddTrack }) {
   return (
     <section className="latest-section" aria-label="Albums">
       <h2 className="cal-sans-title">Albums</h2>
       <div className="latest-grid" style={{ gap: 24, justifyContent: 'flex-start' }}>
-        {tracks.map(t => <AlbumItem key={t.id} track={t} onPlay={onPlay} onAdd={onAdd} />)}
+        {tracks.map(t => (
+          <AlbumItem
+            key={t.id}
+            track={t}
+            onPlayAlbum={onPlayAlbum}
+            onAddAlbum={onAddAlbum}
+            onPlayTrack={onPlayTrack}
+            onAddTrack={onAddTrack}
+          />
+        ))}
       </div>
     </section>
   )

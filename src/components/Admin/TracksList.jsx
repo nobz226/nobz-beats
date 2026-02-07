@@ -13,7 +13,7 @@ export default function TracksList() {
 
   const startEdit = (track) => {
     setEditingId(track._id)
-    setEditState({ title: track.title, description: track.description })
+    setEditState({ title: track.title, description: track.description, type: track.type || 'single' })
   }
 
   const saveEdit = async (id) => {
@@ -22,6 +22,7 @@ export default function TracksList() {
       const patch = {}
       if (Object.prototype.hasOwnProperty.call(editState, 'title')) patch.title = editState.title
       if (Object.prototype.hasOwnProperty.call(editState, 'description')) patch.description = editState.description
+      if (Object.prototype.hasOwnProperty.call(editState, 'type')) patch.type = editState.type
       // If nothing to update, just close editor
       if (Object.keys(patch).length === 0) {
         setEditingId(null)
@@ -65,6 +66,14 @@ export default function TracksList() {
                 <div>
                   <input value={editState.title} onChange={e => setEditState({...editState, title: e.target.value})} />
                   <textarea value={editState.description} onChange={e => setEditState({...editState, description: e.target.value})} />
+                  <div style={{marginTop: 8}}>
+                    <label style={{display: 'block', fontSize: 12}}>Type</label>
+                    <select value={editState.type} onChange={e => setEditState({...editState, type: e.target.value})}>
+                      <option value="single">Single</option>
+                      <option value="album">Album track</option>
+                      <option value="remix">Remix</option>
+                    </select>
+                  </div>
                 </div>
               ) : (
                 <div>

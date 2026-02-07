@@ -1,20 +1,15 @@
 import React from 'react'
+import { SingleItem } from './Singles'
+import { AlbumItem } from './Albums'
 
-export default function Latest() {
-  const latest = {
-    title: 'No Escape',
-    type: 'Single',
-    artwork: '/assets/logo/logoSVG.svg',
-    description: 'Out now — stream on all platforms.'
-  }
-
+export default function Latest({ single, album, onPlay, onAdd }) {
   return (
     <section className="latest-section" aria-label="Latest release">
       <h2 className="cal-sans-title">Latest</h2>
-      <img className="latest-artwork" src={latest.artwork} alt={`${latest.title} artwork`} />
-      <div className="latest-meta cutive-mono-regular">
-        <div><strong>{latest.title}</strong> · {latest.type}</div>
-        <p style={{ marginTop: '8px', marginBottom: 0 }}>{latest.description}</p>
+
+      <div className="latest-grid">
+        <SingleItem track={single} onPlay={onPlay} onAdd={onAdd} />
+        <AlbumItem track={album} onPlay={onPlay} onAdd={onAdd} />
       </div>
     </section>
   )

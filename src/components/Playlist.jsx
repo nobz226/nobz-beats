@@ -1,8 +1,38 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, currentTrackId }) {
   // tracks passed from app state (playlist)
+  const [durations, setDurations] = useState({})
+  // load durations for playlist tracks
+  useEffect(() => {
+    if (!tracks || tracks.length === 0) return
+    const cleaners = []
+    tracks.forEach(t => {
+      if (!t || !t.src) return
+      if (durations[t.id]) return
+      const audio = new Audio()
+      audio.preload = 'metadata'
+      audio.src = t.src
+      const onLoaded = () => {
+        const sec = audio.duration || 0
+        const m = Math.floor(sec / 60)
+        const s = Math.floor(sec % 60).toString().padStart(2, '0')
+        setDurations(prev => ({ ...prev, [t.id]: `${m}:${s}` }))
+      }
+      const onError = () => {
+        // ignore errors; leave fallback duration
+      }
+      audio.addEventListener('loadedmetadata', onLoaded)
+      audio.addEventListener('error', onError)
+      cleaners.push(() => {
+        audio.removeEventListener('loadedmetadata', onLoaded)
+        audio.removeEventListener('error', onError)
+        try { audio.src = '' } catch (e) {}
+      })
+    })
 
+    return () => cleaners.forEach(fn => fn())
+  }, [tracks])
 
   const ref = useRef(null)
 
@@ -92,7 +122,7 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ flex: 1 }} onClick={() => onSelect && onSelect(t)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect && onSelect(t) } }}>
                 <div className="playlist-title">{t.title}</div>
-                <div className="playlist-meta cutive-mono-regular">{t.artist} · {t.duration}</div>
+                <div className="playlist-meta cutive-mono-regular">{t.artist} · {durations[t.id] || t.duration || '0:00'}</div>
               </div>
               <div style={{ display: 'flex', gap: 8, marginLeft: 8 }}>
                 <button className="btn" aria-label="Play item" onClick={() => onSelect && onSelect(t)}>▶</button>

@@ -8,10 +8,17 @@ import Albums from './components/Albums'
 import AllTracks from './components/AllTracks'
 import About from './components/About'
 import Connect from './components/Connect'
+import Admin from './components/Admin/Admin'
+import ErrorBoundary from './components/Admin/ErrorBoundary'
 import Player from './components/Player'
 import Playlist from './components/Playlist'
 
-const normalize = (p) => (p === '/' || p === '' ? '/latest' : p)
+const normalize = (p) => {
+  if (!p || p === '/') return '/latest'
+  // strip trailing slashes and ignore query/hash
+  const clean = p.split('?')[0].split('#')[0].replace(/\/+$|^\s+|\s+$/g, '')
+  return clean.replace(/\/$/, '') || '/latest'
+}
 
 export default function App() {
   const [route, setRoute] = useState(normalize(window.location.pathname))
@@ -40,11 +47,15 @@ export default function App() {
   const [currentTrack, setCurrentTrack] = useState(singles[0])
 
   useEffect(() => {
-    const onPop = () => setRoute(normalize(window.location.pathname))
+    const onPop = () => {
+      console.debug('[App] popstate ->', window.location.pathname)
+      setRoute(normalize(window.location.pathname))
+    }
     window.addEventListener('popstate', onPop)
 
     // ensure default route is /latest instead of root
     if (window.location.pathname === '/' || window.location.pathname === '') {
+      console.debug('[App] replacing root with /latest')
       history.replaceState(null, '', '/latest')
       setRoute('/latest')
     }
@@ -86,6 +97,18 @@ export default function App() {
   const onPrev = () => {
     const idx = playlist.findIndex(p => p.id === currentTrack.id)
     if (idx > 0) setCurrentTrack(playlist[idx - 1])
+  }
+
+  if (route === '/admin') {
+    // When on the admin dashboard render ONLY the admin page (nothing else)
+    // Wrap Admin in an ErrorBoundary so Convex errors don't unmount the app
+    return (
+      <>
+        <ErrorBoundary>
+          <Admin />
+        </ErrorBoundary>
+      </>
+    )
   }
 
   return (

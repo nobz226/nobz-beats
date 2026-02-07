@@ -71,6 +71,7 @@ export default function Nav() {
       <a href="/alltracks">&gt;AllTracks</a>
       <a href="/about">&gt;About</a>
       <a href="/connect">&gt;Connect</a>
+      <a href="/admin">&gt;Admin</a>
     </nav>
   )
 }  

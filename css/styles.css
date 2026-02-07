@@ -576,6 +576,19 @@ body {
   .player-left { min-width: 120px }
 }
 
+/* Admin pages */
+.admin-page { padding: 120px 32px 80px calc(var(--logo-size) + var(--logo-gap)); color: var(--white); }
+.admin-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 12px }
+.admin-body { background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px }
+.admin-form { display:flex; flex-direction: column; gap: 8px; max-width: 680px }
+.admin-form label { display:flex; flex-direction: column }
+.admin-table { display:flex; flex-direction: column; gap: 8px }
+.admin-table-row { display:grid; grid-template-columns: 80px 1fr 120px 160px; gap: 12px; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.03); align-items: center }
+.admin-table-head { font-weight: 700; opacity: 0.9 }
+.admin-actions { display:flex; gap: 8px }
+.art-cell img { width: 64px; height: 64px; object-fit: cover; border-radius: 6px }
+.muted { color: rgba(255,255,255,0.6); font-size: 13px }
+
 /* visually hidden helper */
 .visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
 

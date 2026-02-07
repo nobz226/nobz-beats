@@ -4,7 +4,7 @@ export function RemixItem({ track, onPlay, onAdd }) {
   const t = track || {
     title: 'Untitled Remix',
     type: 'Remix',
-    artwork: '/assets/logo/logoSVG.svg',
+    artwork: '/logo/logoSVG.svg',
     description: 'Remix track.'
   }
 

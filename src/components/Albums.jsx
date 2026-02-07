@@ -6,7 +6,7 @@ export function AlbumItem({ track, onPlayAlbum, onAddAlbum, onPlayTrack, onAddTr
   const a = track || {
     title: 'Vol.1',
     type: 'Album',
-    artwork: '/assets/artwork/Nobz-Vol.1-Ver3.png',
+    artwork: '/artwork/Nobz-Vol.1-Ver3.png',
     description: 'A melange of genres and influences — from metal to dub, trap and classic boom bap.',
     tracks: []
   }

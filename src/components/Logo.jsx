@@ -156,10 +156,10 @@ export default function Logo() {
   return (
     <div className="logo-container" aria-label="Site logo" role="link" tabIndex={0} onClick={navigateHome} onKeyDown={onKeyDown}>
       <div ref={rootRef} className="logo-glitch" role="img" aria-label="Site logo">
-        <img className="logo-base" src="/assets/logo/logoSVG.svg" alt="Site logo" />
-        <img className="logo-r" src="/assets/logo/logoSVG.svg" aria-hidden="true" />
-        <img className="logo-g" src="/assets/logo/logoSVG.svg" aria-hidden="true" />
-        <img className="logo-b" src="/assets/logo/logoSVG.svg" aria-hidden="true" />
+        <img className="logo-base" src="/logo/logoSVG.svg" alt="Site logo" />
+        <img className="logo-r" src="/logo/logoSVG.svg" aria-hidden="true" />
+        <img className="logo-g" src="/logo/logoSVG.svg" aria-hidden="true" />
+        <img className="logo-b" src="/logo/logoSVG.svg" aria-hidden="true" />
         <div className="glitch-slices" aria-hidden="true"></div>
       </div>
     </div>

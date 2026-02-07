@@ -10,7 +10,7 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
         {items.map(it => (
           <li key={it.id} className={`alltracks-item ${currentTrackId === it.id ? 'playing' : ''}`}>
             <div className="alltracks-left">
-              <img className="track-artwork" src={it.artwork || '/assets/logo/logoSVG.svg'} alt={`${it.title} artwork`} />
+              <img className="track-artwork" src={it.artwork || '/logo/logoSVG.svg'} alt={`${it.title} artwork`} />
               <div className="alltracks-info">
                 <div style={{ fontWeight: 700, fontSize: 16 }}>{it.title}</div>
                 <div className="cutive-mono-regular" style={{ fontSize: 13 }}>{it.artist}{it.album ? ` • ${it.album}` : ''}</div>

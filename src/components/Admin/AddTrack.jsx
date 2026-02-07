@@ -66,10 +66,10 @@ export default function AddTrack() {
       } else if (type === 'album' && albumId) {
         // No artwork provided but track is part of an album -> use album artwork
         const alb = albums.find(a => (a._id || a.id) === albumId)
-        artworkUrl = alb?.artwork || '/assets/artwork/default.png'
+        artworkUrl = alb?.artwork || '/artwork/default.png'
       } else if (type === 'single' || type === 'remix') {
         // Single or remix with no artwork -> use default
-        artworkUrl = '/assets/artwork/default.png'
+        artworkUrl = '/artwork/default.png'
       }
 
       let audioUrl = ''

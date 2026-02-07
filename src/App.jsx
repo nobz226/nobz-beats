@@ -35,7 +35,7 @@ export default function App() {
       id: t._id || t.id,
       title: t.title,
       artist: t.artist || 'Nobz',
-      artwork: t.artwork || '/assets/artwork/default.png',
+      artwork: t.artwork || '/artwork/default.png',
       src: t.src,
       duration: t.duration || '0:00',
       description: t.description,
@@ -46,7 +46,7 @@ export default function App() {
     id: a._id || a.id,
     title: a.title,
     artist: a.artist || 'Nobz',
-    artwork: a.artwork || '/assets/artwork/default.png',
+    artwork: a.artwork || '/artwork/default.png',
     description: a.description,
     tracks: dbTracks
       .filter(t => (t.albumId === (a._id || a.id)))
@@ -59,7 +59,7 @@ export default function App() {
       id: t._id || t.id,
       title: t.title,
       artist: t.artist || 'Nobz',
-      artwork: t.artwork || '/assets/artwork/default.png',
+      artwork: t.artwork || '/artwork/default.png',
       src: t.src,
       duration: t.duration || '0:00',
       description: t.description,
@@ -72,7 +72,7 @@ export default function App() {
       id: t._id || t.id,
       title: t.title,
       artist: t.artist || 'Nobz',
-      artwork: t.artwork || (album ? album.artwork : '/assets/artwork/default.png'),
+      artwork: t.artwork || (album ? album.artwork : '/artwork/default.png'),
       src: t.src,
       duration: t.duration || '0:00',
       description: t.description,
@@ -90,8 +90,8 @@ export default function App() {
   const latestTrack = latestTrackRaw ? {
     id: latestTrackRaw._id || latestTrackRaw.id,
     title: latestTrackRaw.title,
-    artist: latestTrackRaw.artist || 'NOBZ>BEATS',
-    artwork: latestTrackRaw.artwork || '/assets/artwork/default.png',
+    artist: latestTrackRaw.artist || 'Nobz',
+    artwork: latestTrackRaw.artwork || '/artwork/default.png',
     src: latestTrackRaw.src,
     duration: latestTrackRaw.duration || '0:00',
     description: latestTrackRaw.description,
@@ -106,8 +106,8 @@ export default function App() {
   const latestAlbum = latestAlbumRaw ? (albums.find(x => x.id === (latestAlbumRaw._id || latestAlbumRaw.id)) || {
     id: latestAlbumRaw._id || latestAlbumRaw.id,
     title: latestAlbumRaw.title,
-    artist: latestAlbumRaw.artist || 'NOBZ>BEATS',
-    artwork: latestAlbumRaw.artwork || '/assets/artwork/default.png',
+    artist: latestAlbumRaw.artist || 'Nobz',
+    artwork: latestAlbumRaw.artwork || '/artwork/default.png',
     description: latestAlbumRaw.description,
     tracks: dbTracks.filter(t => (t.albumId === (latestAlbumRaw._id || latestAlbumRaw.id))).map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist }))
   }) : (albums[0] || null)
@@ -223,7 +223,7 @@ export default function App() {
         {route === '/about' && <About />}
         {route === '/connect' && <Connect /> }
       </main>
-      <Player track={currentTrack || { src: '', artwork: '/assets/logo/logoSVG.svg', title: '', artist: '' }} onNext={onNext} onPrev={onPrev} onEnded={onNext} />
+      <Player track={currentTrack || { src: '', artwork: '/logo/logoSVG.svg', title: '', artist: '' }} onNext={onNext} onPrev={onPrev} onEnded={onNext} />
       <Playlist tracks={playlist} onSelect={playTrack} onAdd={addToPlaylist} onPlayPlaylist={playPlaylist} onShuffle={shufflePlaylist} onClear={clearPlaylist} currentTrackId={currentTrack?.id} />
     </>
   )

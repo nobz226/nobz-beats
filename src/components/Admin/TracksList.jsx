@@ -59,7 +59,7 @@ export default function TracksList() {
         {tracks.map(track => (
           <div key={String(track._id)} className="admin-table-row">
             <div className="art-cell">
-              <img src={track.artwork || '/assets/artwork/default.png'} alt="art" width={64} height={64} />
+              <img src={track.artwork || '/artwork/default.png'} alt="art" width={64} height={64} />
             </div>
             <div>
               {editingId === track._id ? (

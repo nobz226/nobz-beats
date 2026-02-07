@@ -27,7 +27,7 @@ export default function AlbumsList() {
         </div>
         {albums.map(a => (
           <div key={String(a._id)} className="admin-table-row">
-            <div className="art-cell"><img src={a.artwork || '/assets/artwork/default.png'} alt="art" width={64} height={64} /></div>
+            <div className="art-cell"><img src={a.artwork || '/artwork/default.png'} alt="art" width={64} height={64} /></div>
             <div>
               <strong>{a.title}</strong>
               <div className="muted">{a.description}</div>

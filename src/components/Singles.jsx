@@ -4,7 +4,7 @@ export function SingleItem({ track, onPlay, onAdd }) {
   const t = track || {
     title: 'Armitage',
     type: 'Single',
-    artwork: '/assets/logo/logoSVG.svg',
+    artwork: '/logo/logoSVG.svg',
     description: 'Dub inspired chill but brooding beat.'
   }
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useQuery } from 'convex/react'
 import Logo from './components/Logo'
 import Nav from './components/Nav'
 import Title from './components/Title'
@@ -23,28 +24,45 @@ const normalize = (p) => {
 export default function App() {
   const [route, setRoute] = useState(normalize(window.location.pathname))
 
-  // sample catalogue
-  const singles = [
-    { id: 's1', title: 'Armitage', artist: 'NOBZ>BEATS', artwork: '/assets/logo/logoSVG.svg', src: '/assets/audio/sample.mp3', duration: '3:25' }
-  ]
+  // fetch catalogue from Convex
+  const dbTracks = useQuery('functions/tracks:listTracks') || []
+  const dbAlbums = useQuery('functions/albums:listAlbums') || []
 
-  const albums = [
-    {
-      id: 'a1',
-      title: 'Vol.1',
-      artist: 'NOBZ>BEATS',
-      artwork: '/assets/artwork/Nobz-Vol.1-Ver3.png',
-      description: 'A melange of genres and influences — from metal to dub, trap and classic boom bap.',
-      tracks: [
-        { id: 'a1t1', title: 'Awakening', artist: 'NOBZ>BEATS', src: '/assets/audio/sample.mp3', duration: '4:12' },
-        { id: 'a1t2', title: 'Afterglow', artist: 'NOBZ>BEATS', src: '/assets/audio/sample.mp3', duration: '5:04' }
-      ]
-    }
-  ]
+  const singles = dbTracks
+    .filter(t => !t.albumId)
+    .map(t => ({
+      id: t._id || t.id,
+      title: t.title,
+      artist: t.artist || 'NOBZ>BEATS',
+      artwork: t.artwork || '/assets/artwork/default.png',
+      src: t.src,
+      duration: t.duration || '0:00',
+      description: t.description,
+      type: t.type || 'Single'
+    }))
+
+  const albums = dbAlbums.map(a => ({
+    id: a._id || a.id,
+    title: a.title,
+    artist: a.artist || 'NOBZ>BEATS',
+    artwork: a.artwork || '/assets/artwork/default.png',
+    description: a.description,
+    tracks: dbTracks
+      .filter(t => (t.albumId === (a._id || a.id)))
+      .map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist }))
+  }))
 
   // app state: playlist and current track
-  const [playlist, setPlaylist] = useState(singles)
-  const [currentTrack, setCurrentTrack] = useState(singles[0])
+  const [playlist, setPlaylist] = useState([])
+  const [currentTrack, setCurrentTrack] = useState(null)
+
+  // initialize playlist when data loads
+  useEffect(() => {
+    if (!currentTrack && singles.length > 0) {
+      setPlaylist(singles)
+      setCurrentTrack(singles[0])
+    }
+  }, [singles])
 
   useEffect(() => {
     const onPop = () => {
@@ -124,7 +142,7 @@ export default function App() {
         {route === '/about' && <About />}
         {route === '/connect' && <Connect /> }
       </main>
-      <Player track={currentTrack} onNext={onNext} onPrev={onPrev} onEnded={onNext} />
+      <Player track={currentTrack || { src: '', artwork: '/assets/logo/logoSVG.svg', title: '', artist: '' }} onNext={onNext} onPrev={onPrev} onEnded={onNext} />
       <Playlist tracks={playlist} onSelect={playTrack} onAdd={addToPlaylist} onPlayPlaylist={playPlaylist} onShuffle={shufflePlaylist} onClear={clearPlaylist} currentTrackId={currentTrack?.id} />
     </>
   )

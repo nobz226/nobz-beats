@@ -209,13 +209,14 @@ body {
 .site-nav a:nth-child(3) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .36s); }
 .site-nav a:nth-child(4) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .48s); }
 .site-nav a:nth-child(5) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .60s); }
+.site-nav a:nth-child(6) { animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .72s); }
 
 /* Playlist — positioned just after the nav (measured by JS) */
 .playlist {
   position: fixed;
   top: 75px;
   left: auto; /* left is set dynamically via JS to sit past the last nav item */
-  width: 320px; /* increased width */
+  width: 300px; /* increased width */
   height: 500px; /* taller, expands downward */
   max-height: calc(100vh - 120px);
   overflow-y: auto; /* enable scrolling when content exceeds height */
@@ -253,7 +254,12 @@ body {
   list-style: none;
   padding: 0;
   margin-top: 12px;
+  max-height: 520px;
+  overflow: auto;
 }
+
+.alltracks-list::-webkit-scrollbar { width: 12px; }
+.alltracks-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.04); border-radius: 8px; }
 
 .alltracks-item {
   display: flex;
@@ -397,7 +403,7 @@ body {
 
 .latest-section {
   position: fixed;
-  left: calc(var(--logo-size) + var(--logo-gap));
+  left: calc(var(--logo-size) + var(--logo-gap) + 18px);
   top: 230px;
   z-index: 1000;
   color: var(--white);
@@ -451,7 +457,9 @@ body {
 
 .album-left { width: 360px; }
 .album-tracks { flex: 1; overflow: hidden; max-height: 0; opacity: 0; transform: translateX(-12px); transition: max-height .36s cubic-bezier(.22,.8,.25,1), opacity .28s ease, transform .36s cubic-bezier(.22,.8,.25,1); }
-.album-tracks.expanded { max-height: 1600px; opacity: 1; transform: translateX(0); }
+.album-tracks.expanded { max-height: 360px; overflow: auto; opacity: 1; transform: translateX(0); }
+.album-tracks.expanded::-webkit-scrollbar { width: 10px; }
+.album-tracks.expanded::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.04); border-radius: 8px; }
 .album-track-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.02); }
 .album-track-actions { display: flex; gap: 8px; align-items: center }
 

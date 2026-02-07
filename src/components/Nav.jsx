@@ -68,10 +68,10 @@ export default function Nav() {
     <nav ref={navRef} className="site-nav" aria-label="Primary navigation" onClick={onClick}>
       <a href="/singles">&gt;Singles</a>
       <a href="/albums">&gt;Albums</a>
+      <a href="/albums">&gt;Remixes</a>
       <a href="/alltracks">&gt;AllTracks</a>
       <a href="/about">&gt;About</a>
       <a href="/connect">&gt;Connect</a>
-      <a href="/admin">&gt;Admin</a>
     </nav>
   )
 }  

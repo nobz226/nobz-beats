@@ -1,4 +1,5 @@
 import React from 'react'
+import Cover from './Cover'
 
 export function SingleItem({ track, onPlay, onAdd }) {
   const t = track || {
@@ -10,7 +11,7 @@ export function SingleItem({ track, onPlay, onAdd }) {
 
   return (
     <div className="latest-item" aria-label={`Single ${t.title}`}>
-      <img className="latest-artwork" src={t.artwork} alt={`${t.title} artwork`} />
+      <Cover track={t} onPlay={onPlay} className="latest-artwork-cover" />
       <div className="latest-meta cutive-mono-regular">
         <strong>{t.title}</strong>
         <div style={{ marginTop: 6 }}>{t.type}</div>

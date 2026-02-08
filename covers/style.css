@@ -1,0 +1,94 @@
+/*
+  style.css — refactored
+  - Removed unused player/control styles
+  - Removed !important usage
+  - Organized groups: base → album → vinyl → utilities → animations
+*/
+
+@import url(https://fonts.googleapis.com/css?family=Raleway:400,300,500);
+
+html {
+  background-color: #f0f39c;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after { box-sizing: inherit; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Raleway', sans-serif;
+}
+
+/* ----- Album (container) ----- */
+.album {
+  /* center the album in the viewport */
+  transform: translate(-50%, -50%);
+  transition: transform 250ms ease-in-out;
+  box-shadow: 0 0 10px rgba(0,0,0,0.12);
+  cursor: pointer;
+  height: 310px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 310px;
+  z-index: 100;
+}
+
+.album__cover {
+  background-color: #000;
+  background-size: cover;
+  height: 100%;
+  position: relative;
+  width: 100%;
+  z-index: 20;
+}
+
+/* ----- Vinyl (hidden by default) ----- */
+.vinyl {
+  /* position vinyl so its visible state peeks ~40% outside the album */
+  /* visible left = album width - outsidePx (310 - 116 = 194px) */
+  left: calc(100% - 116px);
+  /* hidden by default: move it left so it's tucked behind the cover */
+  transform: translateX(-116px);
+  transition: transform 300ms ease, opacity 300ms ease;
+  opacity: 0;
+  position: absolute;
+  top: 10px;
+  height: 290px;
+  width: 290px;
+}
+
+/* When album is toggled out, slide vinyl into visible position (appears from behind the cover) */
+.album.album--out .vinyl { transform: translateX(0); opacity: 1; }
+
+.vinyl__shadow,
+.vinyl__circle { border-radius: 100%; height: 100%; left: 0; position: absolute; top: 0; width: 100%; }
+
+.vinyl__shadow { display: none; z-index: 5; }
+
+/* Use the provided PNG as the visible disc. Start paused. */
+.vinyl__circle {
+  animation: rotate 1s linear infinite both paused;
+  background-color: transparent;
+  background-image: url('images/default.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* Enable spinning when album has playing state */
+.album.album--playing .vinyl__circle { animation-play-state: running; }
+
+.vinyl__center { display: none; }
+.vinyl__center:before,
+.vinyl__center:after { display: none; }
+
+/* small utility for fade elements (kept for compatibility) */
+.has-fade-in { transition: opacity 500ms ease-in-out; opacity: 0; }
+.album.album--out .has-fade-in { opacity: 1; }
+
+/* ----- Animations ----- */
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

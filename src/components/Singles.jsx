@@ -11,7 +11,7 @@ export function SingleItem({ track, onPlay, onAdd }) {
 
   return (
     <div className="latest-item" aria-label={`Single ${t.title}`}>
-      <Cover track={t} onPlay={onPlay} className="latest-artwork-cover" />
+      <Cover track={t} onPlay={onPlay} className="latest-artwork-cover" sleeveImage="/artwork/single.jpg" />
       <div className="latest-meta cutive-mono-regular">
         <strong>{t.title}</strong>
         <div style={{ marginTop: 6 }}>{t.type}</div>
@@ -29,7 +29,7 @@ export default function Singles({ tracks = [], onPlay, onAdd }) {
   return (
     <section className="latest-section" aria-label="Singles">
       <h2 className="cal-sans-title">Singles</h2>
-      <div className="latest-grid" style={{ gap: 24, justifyContent: 'flex-start' }}>
+      <div className="latest-grid" style={{ gap: '6rem', justifyContent: 'flex-start' }}>
         {tracks.map(t => <SingleItem key={t.id} track={t} onPlay={onPlay} onAdd={onAdd} />)}
       </div>
     </section>

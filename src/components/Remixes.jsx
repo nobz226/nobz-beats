@@ -1,4 +1,5 @@
 import React from 'react'
+import Cover from './Cover'
 
 export function RemixItem({ track, onPlay, onAdd }) {
   const t = track || {
@@ -10,7 +11,7 @@ export function RemixItem({ track, onPlay, onAdd }) {
 
   return (
     <div className="latest-item" aria-label={`Remix ${t.title}`}>
-      <img className="latest-artwork" src={t.artwork} alt={`${t.title} artwork`} />
+      <Cover track={t} onPlay={onPlay} className="latest-artwork-cover" sleeveImage="/artwork/single.jpg" />
       <div className="latest-meta cutive-mono-regular">
         <strong>{t.title}</strong>
         <div style={{ marginTop: 6 }}>{t.type}</div>
@@ -28,7 +29,7 @@ export default function Remixes({ tracks = [], onPlay, onAdd }) {
   return (
     <section className="latest-section" aria-label="Remixes">
       <h2 className="cal-sans-title">Remixes</h2>
-      <div className="latest-grid" style={{ gap: 24, justifyContent: 'flex-start' }}>
+      <div className="latest-grid" style={{ gap: '6rem', justifyContent: 'flex-start' }}>
         {tracks.map(t => <RemixItem key={t.id} track={t} onPlay={onPlay} onAdd={onAdd} />)}
       </div>
     </section>

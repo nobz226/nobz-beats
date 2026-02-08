@@ -26,6 +26,7 @@
   height: 20rem;
   cursor: pointer;
   user-select: none;
+  background-image: url("/artwork/single.jpg");
 }
 .cover:focus-visible { outline: 2px solid rgba(255,255,255,0.9); outline-offset: 4px }
 .cover__artwork {
@@ -37,6 +38,17 @@
   box-shadow: 0 8px 22px rgba(0,0,0,0.5);
   position: relative;
   z-index: 20; /* ensure sleeve sits above vinyl */
+}
+
+.cover__logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: auto;
+  pointer-events: none;
+  display: block;
 }
 .latest-artwork-cover { margin-right: 1rem }
 

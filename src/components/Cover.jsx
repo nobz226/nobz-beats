@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 // Reusable cover component with vinyl that pops out and spins while playback
-export default function Cover({ track, onPlay, className }) {
+export default function Cover({ track, onPlay, className, sleeveImage }) {
   const [out, setOut] = useState(false)
   const [spinning, setSpinning] = useState(false)
   const trackRef = useRef(track)
@@ -75,8 +75,14 @@ export default function Cover({ track, onPlay, className }) {
 
   return (
     <div className={['cover', className].filter(Boolean).join(' ')} role="button" tabIndex={0} onClick={handleClick} aria-pressed={String(spinning)} aria-label={`Cover ${track?.title || ''}`}>
-      {/* Sleeve only - remove artwork image per request */}
-      <div className="cover__artwork" aria-hidden="true" />
+      {/* Sleeve: use provided sleeveImage or fallback to solid black */}
+      <div
+        className="cover__artwork"
+        aria-hidden="true"
+        style={sleeveImage ? { backgroundImage: `url(${sleeveImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+      >
+        <img src="/logo/logoSVG.svg" className="cover__logo" alt="" aria-hidden="true" />
+      </div>
 
       <div className={["vinyl", out ? 'vinyl--visible' : ''].join(' ')} aria-hidden={!out}>
         <div className="vinyl__shadow" />

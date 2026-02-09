@@ -163,14 +163,7 @@ export default function App() {
   // app state: playlist and current track
   const [playlist, setPlaylist] = useState([])
   const [currentTrack, setCurrentTrack] = useState(null)
-
-  // initialize playlist when data loads
-  useEffect(() => {
-    if (!currentTrack && singles.length > 0) {
-      setPlaylist(singles)
-      setCurrentTrack(singles[0])
-    }
-  }, [singles])
+  // Note: playlist intentionally starts empty on first load.
 
   useEffect(() => {
     const onPop = () => {

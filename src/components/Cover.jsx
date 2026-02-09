@@ -64,8 +64,27 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
   }, [])
 
   const handleClick = (e) => {
-    // Toggle visible/out state. Per requirement: clicking cover pops vinyl out but does not auto-spin.
-    setOut(prev => !prev)
+    e.stopPropagation()
+    // If this track is currently loaded in the global audio element -> toggle play/pause
+    const audio = document.querySelector('.audio-player audio')
+    if (audio && matchesAudioSrc(audio)) {
+      if (audio.paused) {
+        audio.play().catch(() => {})
+      } else {
+        audio.pause()
+      }
+      // ensure the sleeve is out when toggling play
+      setOut(true)
+      return
+    }
+
+    // If different track or no audio yet: request parent to play this track and try to autoplay
+    setOut(true)
+    if (onPlay) onPlay(track)
+    // attempt to play if audio exists (Player will set src on track change)
+    if (audio) {
+      setTimeout(() => audio.play().catch(() => {}), 50)
+    }
   }
 
   const handlePlay = (e) => {
@@ -84,7 +103,16 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
         <img src="/logo/logoSVG.svg" className="cover__logo" alt="" aria-hidden="true" />
       </div>
 
-      <div className={["vinyl", out ? 'vinyl--visible' : ''].join(' ')} aria-hidden={!out}>
+      <div
+        className={["vinyl", out ? 'vinyl--visible' : ''].join(' ')}
+        aria-hidden={!out}
+        onClick={(e) => {
+          // clicking the vinyl itself should not trigger cover click
+          e.stopPropagation()
+          // only retract the vinyl when it's not spinning
+          if (!spinning) setOut(false)
+        }}
+      >
         <div className="vinyl__shadow" />
         <div
           className={["vinyl__circle", spinning ? 'vinyl__circle--spin' : ''].join(' ')}

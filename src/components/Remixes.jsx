@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import Cover from './Cover'
 
 export function RemixItem({ track, onPlay, onAdd }) {
@@ -9,6 +9,46 @@ export function RemixItem({ track, onPlay, onAdd }) {
     description: 'Remix track.'
   }
 
+  const [isPlaying, setIsPlaying] = useState(false)
+  const trackRef = useRef(t)
+  useEffect(() => { trackRef.current = t }, [t])
+
+  const matchesAudioSrc = (audio) => {
+    if (!audio || !trackRef.current) return false
+    const a = audio.src || ''
+    const s = trackRef.current.src || ''
+    if (!s) return false
+    return a.endsWith(s) || a.includes(s)
+  }
+
+  useEffect(() => {
+    const audio = document.querySelector('.audio-player audio')
+    if (!audio) return
+    const update = () => setIsPlaying(matchesAudioSrc(audio) && !audio.paused)
+    audio.addEventListener('play', update)
+    audio.addEventListener('playing', update)
+    audio.addEventListener('pause', update)
+    audio.addEventListener('ended', update)
+    update()
+    return () => {
+      audio.removeEventListener('play', update)
+      audio.removeEventListener('playing', update)
+      audio.removeEventListener('pause', update)
+      audio.removeEventListener('ended', update)
+    }
+  }, [])
+
+  const handleTogglePlay = async () => {
+    const audio = document.querySelector('.audio-player audio')
+    if (audio && matchesAudioSrc(audio)) {
+      if (!audio.paused) audio.pause()
+      else await audio.play().catch(() => {})
+      return
+    }
+    if (onPlay) onPlay(t)
+    if (audio) setTimeout(() => audio.play().catch(() => {}), 50)
+  }
+
   return (
     <div className="latest-item" aria-label={`Remix ${t.title}`}>
       <Cover track={t} onPlay={onPlay} className="latest-artwork-cover" sleeveImage="/artwork/single.jpg" />
@@ -17,7 +57,7 @@ export function RemixItem({ track, onPlay, onAdd }) {
         <div style={{ marginTop: 6 }}>{t.type}</div>
         <p className="latest-description" style={{ marginTop: 8 }}>{t.description}</p>
         <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn" aria-label="Play" onClick={() => onPlay && onPlay(t)}>▶</button>
+          <button className="btn" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>
           <button className="btn" aria-label="Add to playlist" onClick={() => onAdd && onAdd(t)}>＋</button>
         </div>
       </div>

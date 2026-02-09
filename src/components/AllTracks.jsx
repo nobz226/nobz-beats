@@ -59,16 +59,25 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
                       if (isMatch) {
                         if (!audio.paused) {
                           audio.pause()
-                          try { setVinylState(String(it.id || it._id), { spinning: false }) } catch (e) {}
+                          try {
+                            setVinylState(String(it.id || it._id), { spinning: false })
+                            if (it.albumId) setVinylState(String(it.albumId), { out: false, spinning: false })
+                          } catch (e) {}
                         } else {
                           audio.play().catch(() => {})
-                          try { setVinylState(String(it.id || it._id), { out: true, spinning: true }) } catch (e) {}
+                          try {
+                            setVinylState(String(it.id || it._id), { out: true, spinning: true })
+                            if (it.albumId) setVinylState(String(it.albumId), { out: true, spinning: true })
+                          } catch (e) {}
                         }
                         return
                       }
                       if (onPlay) onPlay(it)
                       setTimeout(() => { try { audio.play().catch(() => {}) } catch (e) {} }, 50)
-                      try { setVinylState(String(it.id || it._id), { out: true, spinning: true }) } catch (e) {}
+                      try {
+                        setVinylState(String(it.id || it._id), { out: true, spinning: true })
+                        if (it.albumId) setVinylState(String(it.albumId), { out: true, spinning: true })
+                      } catch (e) {}
                     }}
                   >{isThisPlaying ? '⏸' : '▶'}</button>
                   <button className="btn" aria-label="Add to playlist" onClick={() => onAdd && onAdd(it)}>＋</button>

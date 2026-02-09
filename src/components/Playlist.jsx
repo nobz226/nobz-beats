@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { setVinylState } from '../lib/vinyl'
 
 export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, currentTrackId, currentTrack }) {
   // tracks passed from app state (playlist)
@@ -173,8 +174,19 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
                         const s = t.src || ''
                         const isMatch = s && (a.endsWith(s) || a.includes(s))
                         if (isMatch) {
-                          if (!audio.paused) audio.pause()
-                          else audio.play().catch(() => {})
+                          if (!audio.paused) {
+                            audio.pause()
+                            try {
+                              setVinylState(String(t.id || t._id), { spinning: false })
+                              if (t.albumId) setVinylState(String(t.albumId), { out: false, spinning: false })
+                            } catch (e) {}
+                          } else {
+                            audio.play().catch(() => {})
+                            try {
+                              setVinylState(String(t.id || t._id), { out: true, spinning: true })
+                              if (t.albumId) setVinylState(String(t.albumId), { out: true, spinning: true })
+                            } catch (e) {}
+                          }
                           return
                         }
                         if (onSelect) onSelect(t)

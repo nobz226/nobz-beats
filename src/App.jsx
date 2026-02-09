@@ -60,7 +60,7 @@ export default function App() {
     description: a.description,
     tracks: dbTracks
       .filter(t => (t.albumId === (a._id || a.id)))
-      .map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist }))
+      .map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist, albumId: (a._id || a.id) }))
   }))
 
   const remixes = dbTracks
@@ -90,6 +90,7 @@ export default function App() {
       duration: t.duration || '0:00',
       description: t.description,
       album: album ? album.title : undefined,
+      albumId: album ? (album._id || album.id) : undefined,
       type: t.type || 'single'
     }
   })

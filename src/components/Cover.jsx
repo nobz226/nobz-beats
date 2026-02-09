@@ -111,37 +111,59 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     if (myId) {
       try {
         // If this item has child tracks (album), subscribe to each child track id
-        const childIds = (current && Array.isArray(current.tracks) && current.tracks.length > 0)
+        // Also include the parent album id so parent-level vinyl state changes
+        // (set on album pause/play) are considered when computing aggregate state.
+        const childTrackIds = (current && Array.isArray(current.tracks) && current.tracks.length > 0)
           ? current.tracks.map(t => String(t.id || t._id || t))
-          : [String(myId)]
+          : []
+        const parentId = myId ? String(myId) : null
+        const subscribeIds = parentId ? [...childTrackIds, parentId] : [...childTrackIds]
 
         // initial aggregate state
         try {
           let anyOut = false
           let anySpinning = false
-          for (const cid of childIds) {
-            const s = getVinylState(String(cid))
-            if (s) {
-              if (s.out) anyOut = true
-              if (s.spinning) anySpinning = true
+          // If parent/album-level state exists, treat it as authoritative
+          try {
+            const p = parentId && getVinylState(parentId)
+            if (p) {
+              anyOut = !!p.out
+              anySpinning = !!p.spinning
+            } else {
+              for (const cid of childTrackIds) {
+                const s = getVinylState(String(cid))
+                if (s) {
+                  if (s.out) anyOut = true
+                  if (s.spinning) anySpinning = true
+                }
+              }
             }
-          }
+          } catch (e) {}
           setOut(anyOut)
           setSpinning(anySpinning)
         } catch (e) {}
 
         // subscribe to each child id and update aggregate state on changes
-        const unsubs = childIds.map(cid => subscribeToVinyl(String(cid), () => {
+        const unsubs = subscribeIds.map(cid => subscribeToVinyl(String(cid), () => {
           try {
             let anyOut = false
             let anySpinning = false
-            for (const idd of childIds) {
-              const s = getVinylState(String(idd))
-              if (s) {
-                if (s.out) anyOut = true
-                if (s.spinning) anySpinning = true
+            // parent state overrides children if present
+            try {
+              const p = parentId && getVinylState(parentId)
+              if (p) {
+                anyOut = !!p.out
+                anySpinning = !!p.spinning
+              } else {
+                for (const idd of childTrackIds) {
+                  const s = getVinylState(String(idd))
+                  if (s) {
+                    if (s.out) anyOut = true
+                    if (s.spinning) anySpinning = true
+                  }
+                }
               }
-            }
+            } catch (err) {}
             setOut(anyOut)
             setSpinning(anySpinning)
             if (!anyOut && !anySpinning) {
@@ -160,7 +182,16 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     }
 
     return () => {
-      try { if (vinylUnsubRef.current) { vinylUnsubRef.current(); vinylUnsubRef.current = null } } catch (e) {}
+      try {
+        if (vinylUnsubRef.current) {
+          if (Array.isArray(vinylUnsubRef.current)) {
+            vinylUnsubRef.current.forEach(fn => { try { fn() } catch (e) {} })
+          } else {
+            try { vinylUnsubRef.current() } catch (e) {}
+          }
+          vinylUnsubRef.current = null
+        }
+      } catch (e) {}
     }
   }, [track && (track._id || track.id)])
 

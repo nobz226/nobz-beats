@@ -21,7 +21,11 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
       // retract vinyl when playback ends
       try {
         const id = (track && ((track._id || track.id)))
-        if (id) setVinylState(String(id), { out: false, spinning: false })
+        if (id) {
+          setVinylState(String(id), { out: false, spinning: false })
+          const albumId = track && track.albumId
+          if (albumId) setVinylState(String(albumId), { out: false, spinning: false })
+        }
       } catch (err) {}
     }
 
@@ -34,13 +38,21 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
     const onPlayState = () => {
       try {
         const id = (track && ((track._id || track.id)))
-        if (id) setVinylState(String(id), { out: true, spinning: true })
+        if (id) {
+          setVinylState(String(id), { out: true, spinning: true })
+          const albumId = track && track.albumId
+          if (albumId) setVinylState(String(albumId), { out: true, spinning: true })
+        }
       } catch (err) {}
     }
     const onPauseState = () => {
       try {
         const id = (track && ((track._id || track.id)))
-        if (id) setVinylState(String(id), { spinning: false })
+        if (id) {
+          setVinylState(String(id), { spinning: false })
+          const albumId = track && track.albumId
+          if (albumId) setVinylState(String(albumId), { spinning: false })
+        }
       } catch (err) {}
     }
 

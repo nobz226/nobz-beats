@@ -91,92 +91,48 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     }
   }, [])
 
-  // Subscribe/unsubscribe to vinyl store whenever the `track` prop (id) changes.
+  // Subscribe to primary vinyl id (album id for albums, track id for singles)
   useEffect(() => {
     const current = track
     const myId = (current && ((current._id || current.id)))
+
     // cleanup previous
     try {
       if (vinylUnsubRef.current) {
-        // vinylUnsubRef.current may be a single fn or array of fns
-        if (Array.isArray(vinylUnsubRef.current)) {
-          vinylUnsubRef.current.forEach(fn => { try { fn() } catch (e) {} })
-        } else {
-          try { vinylUnsubRef.current() } catch (e) {}
-        }
+        // vinylUnsubRef.current may be a single fn
+        try { vinylUnsubRef.current() } catch (e) {}
         vinylUnsubRef.current = null
       }
     } catch (e) {}
 
     if (myId) {
       try {
-        // If this item has child tracks (album), subscribe to each child track id
-        // Also include the parent album id so parent-level vinyl state changes
-        // (set on album pause/play) are considered when computing aggregate state.
-        const childTrackIds = (current && Array.isArray(current.tracks) && current.tracks.length > 0)
-          ? current.tracks.map(t => String(t.id || t._id || t))
-          : []
-        const parentId = myId ? String(myId) : null
-        const subscribeIds = parentId ? [...childTrackIds, parentId] : [...childTrackIds]
+        const primaryId = String(myId)
 
-        // initial aggregate state
+        // initial state from store
         try {
-          let anyOut = false
-          let anySpinning = false
-          // If parent/album-level state exists, treat it as authoritative
-          try {
-            const p = parentId && getVinylState(parentId)
-            if (p) {
-              anyOut = !!p.out
-              anySpinning = !!p.spinning
-            } else {
-              for (const cid of childTrackIds) {
-                const s = getVinylState(String(cid))
-                if (s) {
-                  if (s.out) anyOut = true
-                  if (s.spinning) anySpinning = true
-                }
-              }
-            }
-          } catch (e) {}
-          setOut(anyOut)
-          setSpinning(anySpinning)
+          const s = getVinylState(primaryId)
+          setOut(!!(s && s.out))
+          setSpinning(!!(s && s.spinning))
         } catch (e) {}
 
-        // subscribe to each child id and update aggregate state on changes
-        const unsubs = subscribeIds.map(cid => subscribeToVinyl(String(cid), () => {
+        // subscribe to primary id only — album-level state is authoritative
+        const unsub = subscribeToVinyl(primaryId, (detail) => {
           try {
-            let anyOut = false
-            let anySpinning = false
-            // parent state overrides children if present
-            try {
-              const p = parentId && getVinylState(parentId)
-              if (p) {
-                anyOut = !!p.out
-                anySpinning = !!p.spinning
-              } else {
-                for (const idd of childTrackIds) {
-                  const s = getVinylState(String(idd))
-                  if (s) {
-                    if (s.out) anyOut = true
-                    if (s.spinning) anySpinning = true
-                  }
-                }
-              }
-            } catch (err) {}
-            setOut(anyOut)
-            setSpinning(anySpinning)
-            if (!anyOut && !anySpinning) {
+            setOut(!!detail.out)
+            setSpinning(!!detail.spinning)
+
+            // If album was stopped externally and audio still matches, pause audio
+            if (!detail.out && !detail.spinning) {
               const audioEl = document.querySelector('.audio-player audio')
               if (audioEl && matchesAudioSrc(audioEl) && !audioEl.paused) audioEl.pause()
             }
           } catch (err) {}
-        }))
+        })
 
-        vinylUnsubRef.current = unsubs
+        vinylUnsubRef.current = unsub
       } catch (e) {}
     } else {
-      // no id: reset UI
       setOut(false)
       setSpinning(false)
     }
@@ -184,11 +140,7 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     return () => {
       try {
         if (vinylUnsubRef.current) {
-          if (Array.isArray(vinylUnsubRef.current)) {
-            vinylUnsubRef.current.forEach(fn => { try { fn() } catch (e) {} })
-          } else {
-            try { vinylUnsubRef.current() } catch (e) {}
-          }
+          try { vinylUnsubRef.current() } catch (e) {}
           vinylUnsubRef.current = null
         }
       } catch (e) {}

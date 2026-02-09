@@ -764,6 +764,56 @@ body {
   margin-top: 0.75rem;
 }
 
+/* Two-up carousel layout: reuse existing sizing but show only two items at a time.
+   The `.two-up-carousel` contains left/right arrows and a horizontal track. */
+.two-up-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.two-up-carousel .carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.02);
+  border: none;
+  color: var(--white);
+  width: 3rem;
+  height: 3rem;
+  display: inline-grid;
+  place-items: center;
+  cursor: pointer;
+  border-radius: 999px;
+  font-size: 1.125rem;
+  z-index: 40;
+}
+
+.two-up-carousel .carousel-arrow--left { left: -5rem }
+.two-up-carousel .carousel-arrow--right { right: -5rem }
+
+.two-up-carousel .carousel-track {
+  display: flex;
+  gap: 6rem; /* keep same gap as latest-grid */
+  align-items: flex-start;
+  padding: 0 3.5rem; /* add horizontal padding so arrows sit further from covers */
+}
+
+@media (max-width: 56.25rem) {
+  .two-up-carousel .carousel-arrow--left { left: -2rem }
+  .two-up-carousel .carousel-arrow--right { right: -2rem }
+  .two-up-carousel .carousel-track { padding: 0 1rem }
+}
+
+.two-up-carousel .carousel-slot {
+  display: inline-flex;
+  width: 22.5rem; /* match .latest-item width to avoid relayout */
+  flex: 0 0 22.5rem;
+}
+
+.two-up-carousel .carousel-arrow:focus { outline: 0.125rem solid #ffffff }
+
 .latest-item {
   display: flex;
   flex-direction: column;

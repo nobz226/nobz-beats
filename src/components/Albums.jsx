@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Cover from './Cover'
+import TwoUpCarousel from './TwoUpCarousel'
 
 export function AlbumItem({ track, onPlayAlbum, onAddAlbum }) {
   const a = track || {
@@ -86,7 +87,7 @@ export default function Albums({ tracks = [], onPlayAlbum, onAddAlbum, onPlayTra
   return (
     <section className="latest-section" aria-label="Albums">
       <h2 className="cal-sans-title">Albums</h2>
-      <div className="latest-grid" style={{ gap: '6rem', justifyContent: 'flex-start' }}>
+      <TwoUpCarousel className="latest-grid">
         {tracks.map(t => (
           <AlbumItem
             key={t.id}
@@ -97,7 +98,7 @@ export default function Albums({ tracks = [], onPlayAlbum, onAddAlbum, onPlayTra
             onAddTrack={onAddTrack}
           />
         ))}
-      </div>
+      </TwoUpCarousel>
     </section>
   )
 }

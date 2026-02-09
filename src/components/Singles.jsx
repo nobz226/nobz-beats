@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Cover from './Cover'
+import TwoUpCarousel from './TwoUpCarousel'
 
 export function SingleItem({ track, onPlay, onAdd }) {
   const t = track || {
@@ -69,9 +70,9 @@ export default function Singles({ tracks = [], onPlay, onAdd }) {
   return (
     <section className="latest-section" aria-label="Singles">
       <h2 className="cal-sans-title">Singles</h2>
-      <div className="latest-grid" style={{ gap: '6rem', justifyContent: 'flex-start' }}>
+      <TwoUpCarousel className="latest-grid" >
         {tracks.map(t => <SingleItem key={t.id} track={t} onPlay={onPlay} onAdd={onAdd} />)}
-      </div>
+      </TwoUpCarousel>
     </section>
   )
 }

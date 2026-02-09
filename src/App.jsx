@@ -125,6 +125,40 @@ export default function App() {
     tracks: dbTracks.filter(t => (t.albumId === (latestAlbumRaw._id || latestAlbumRaw.id))).map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist }))
   }) : (albums[0] || null)
 
+  // Build a combined list of recent additions (tracks and albums),
+  // normalized for the Latest view. We'll sort by `createdAt` and
+  // keep the five most recent entries.
+  const latestCandidates = [
+    // include only standalone tracks (no albumId) or explicit remixes
+    ...dbTracks
+      .filter(t => !t.albumId || (t.type && t.type.toString().toLowerCase() === 'remix'))
+      .map(t => ({
+      kind: 'track',
+      id: t._id || t.id,
+      title: t.title,
+      artist: t.artist || 'Nobz',
+      artwork: normalizeAsset(t.artwork) || '/artwork/default.png',
+      src: t.src,
+      duration: t.duration || '0:00',
+      description: t.description,
+      createdAt: t.createdAt || 0
+    })),
+    ...dbAlbums.map(a => ({
+      kind: 'album',
+      id: a._id || a.id,
+      title: a.title,
+      artist: a.artist || 'Nobz',
+      artwork: normalizeAsset(a.artwork) || '/artwork/default.png',
+      description: a.description,
+      tracks: dbTracks
+        .filter(t => (t.albumId === (a._id || a.id)))
+        .map(t => ({ id: t._id || t.id, title: t.title, src: t.src, duration: t.duration || '0:00', description: t.description, artist: t.artist })),
+      createdAt: a.createdAt || 0
+    }))
+  ]
+
+  const latestItems = latestCandidates.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 5)
+
   // app state: playlist and current track
   const [playlist, setPlaylist] = useState([])
   const [currentTrack, setCurrentTrack] = useState(null)
@@ -257,7 +291,7 @@ export default function App() {
       <Nav />
       <Title />
       <main className="main-content">
-        {route === '/latest' && <Latest single={latestTrack} album={latestAlbum} onPlay={playTrack} onAdd={addToPlaylist} onPlayAlbum={playAlbum} onAddAlbum={addAlbumToPlaylist} onPlayTrack={playTrack} onAddTrack={addToPlaylist} />}
+        {route === '/latest' && <Latest items={latestItems} onPlay={playTrack} onAdd={addToPlaylist} onPlayAlbum={playAlbum} onAddAlbum={addAlbumToPlaylist} onPlayTrack={playTrack} onAddTrack={addToPlaylist} />}
         {route === '/singles' && <Singles tracks={singles} onPlay={playTrack} onAdd={addToPlaylist} />}
         {route === '/remixes' && <Remixes tracks={remixes} onPlay={playTrack} onAdd={addToPlaylist} />}
         {route === '/albums' && <Albums tracks={albums} onPlayAlbum={playAlbum} onAddAlbum={addAlbumToPlaylist} onPlayTrack={playTrack} onAddTrack={addToPlaylist} />}

@@ -281,17 +281,20 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
           // clicking the vinyl itself should not trigger cover click
           e.stopPropagation()
           try {
-            // retract the sleeve
-            setOut(false)
-            // if it was spinning for the current track, pause playback and stop spinning
-                    if (spinning) {
-                      const audio = document.querySelector('.audio-player audio')
-                      if (audio && matchesAudioSrc(audio) && !audio.paused) {
-                        audio.pause()
-                      }
-                      setSpinning(false)
-                    }
-                    // update global state and notify other covers
+            // Only allow putting the vinyl back if it's not spinning. If it's spinning, ignore click.
+                if (spinning) {
+                  return
+                }
+                // retract the sleeve and reset playback (stop) for the current track
+                setOut(false)
+                try {
+                  const audio = document.querySelector('.audio-player audio')
+                  if (audio && matchesAudioSrc(audio)) {
+                    try { audio.pause() } catch (e) {}
+                    try { audio.currentTime = 0 } catch (e) {}
+                  }
+                } catch (e) {}
+                // update global state and notify other covers
                     try {
                       const current = trackRef.current
                       const myId = current?._id || current?.id

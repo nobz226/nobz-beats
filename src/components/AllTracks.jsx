@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { setVinylState } from '../lib/vinyl'
 
 export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackId }) {
   const items = allTracks
@@ -56,12 +57,18 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
                       const s = it.src || ''
                       const isMatch = s && (a.endsWith(s) || a.includes(s))
                       if (isMatch) {
-                        if (!audio.paused) audio.pause()
-                        else audio.play().catch(() => {})
+                        if (!audio.paused) {
+                          audio.pause()
+                          try { setVinylState(String(it.id || it._id), { spinning: false }) } catch (e) {}
+                        } else {
+                          audio.play().catch(() => {})
+                          try { setVinylState(String(it.id || it._id), { out: true, spinning: true }) } catch (e) {}
+                        }
                         return
                       }
                       if (onPlay) onPlay(it)
                       setTimeout(() => { try { audio.play().catch(() => {}) } catch (e) {} }, 50)
+                      try { setVinylState(String(it.id || it._id), { out: true, spinning: true }) } catch (e) {}
                     }}
                   >{isThisPlaying ? '⏸' : '▶'}</button>
                   <button className="btn" aria-label="Add to playlist" onClick={() => onAdd && onAdd(it)}>＋</button>

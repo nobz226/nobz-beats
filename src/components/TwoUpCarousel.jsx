@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
 /**
  * Fancier Carousel for Desktop
@@ -30,7 +30,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
       style={{ width: carouselWidth }}
     >
       {/* Viewport for the sliding track */}
-      <div className="carousel-viewport w-full overflow-hidden pt-4">
+      <div className="carousel-viewport w-full overflow-hidden lg:overflow-visible pt-4">
         <div 
           className="carousel-track flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform"
           style={{ 

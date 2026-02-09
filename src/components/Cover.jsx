@@ -93,35 +93,66 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
 
   // Subscribe/unsubscribe to vinyl store whenever the `track` prop (id) changes.
   useEffect(() => {
-    const myId = (track && ((track._id || track.id)))
+    const current = track
+    const myId = (current && ((current._id || current.id)))
     // cleanup previous
     try {
       if (vinylUnsubRef.current) {
-        vinylUnsubRef.current()
+        // vinylUnsubRef.current may be a single fn or array of fns
+        if (Array.isArray(vinylUnsubRef.current)) {
+          vinylUnsubRef.current.forEach(fn => { try { fn() } catch (e) {} })
+        } else {
+          try { vinylUnsubRef.current() } catch (e) {}
+        }
         vinylUnsubRef.current = null
       }
     } catch (e) {}
 
     if (myId) {
       try {
-        const s = getVinylState(String(myId))
-        if (s) {
-          if (typeof s.out === 'boolean') setOut(s.out)
-          if (typeof s.spinning === 'boolean') setSpinning(s.spinning)
-        }
-      } catch (e) {}
+        // If this item has child tracks (album), subscribe to each child track id
+        const childIds = (current && Array.isArray(current.tracks) && current.tracks.length > 0)
+          ? current.tracks.map(t => String(t.id || t._id || t))
+          : [String(myId)]
 
-      vinylUnsubRef.current = subscribeToVinyl(String(myId), (detail) => {
+        // initial aggregate state
         try {
-          const { out: o, spinning: s } = detail || {}
-          if (typeof o === 'boolean') setOut(o)
-          if (typeof s === 'boolean') setSpinning(s)
-          if (o === false && s === false) {
-            const audioEl = document.querySelector('.audio-player audio')
-            if (audioEl && matchesAudioSrc(audioEl) && !audioEl.paused) audioEl.pause()
+          let anyOut = false
+          let anySpinning = false
+          for (const cid of childIds) {
+            const s = getVinylState(String(cid))
+            if (s) {
+              if (s.out) anyOut = true
+              if (s.spinning) anySpinning = true
+            }
           }
-        } catch (err) {}
-      })
+          setOut(anyOut)
+          setSpinning(anySpinning)
+        } catch (e) {}
+
+        // subscribe to each child id and update aggregate state on changes
+        const unsubs = childIds.map(cid => subscribeToVinyl(String(cid), () => {
+          try {
+            let anyOut = false
+            let anySpinning = false
+            for (const idd of childIds) {
+              const s = getVinylState(String(idd))
+              if (s) {
+                if (s.out) anyOut = true
+                if (s.spinning) anySpinning = true
+              }
+            }
+            setOut(anyOut)
+            setSpinning(anySpinning)
+            if (!anyOut && !anySpinning) {
+              const audioEl = document.querySelector('.audio-player audio')
+              if (audioEl && matchesAudioSrc(audioEl) && !audioEl.paused) audioEl.pause()
+            }
+          } catch (err) {}
+        }))
+
+        vinylUnsubRef.current = unsubs
+      } catch (e) {}
     } else {
       // no id: reset UI
       setOut(false)
@@ -153,7 +184,16 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     // update global vinyl state for this item
     try {
       const id = (track && ((track._id || track.id)))
-      if (id) setVinylState(String(id), { out: true, spinning: true })
+      if (track && Array.isArray(track.tracks) && track.tracks.length > 0) {
+        // album: set state for each child track id so Player updates match
+        track.tracks.forEach(t => {
+          const cid = String(t.id || t._id || t)
+          if (cid) setVinylState(cid, { out: true, spinning: true })
+        })
+        if (id) setVinylState(String(id), { out: true, spinning: true })
+      } else {
+        if (id) setVinylState(String(id), { out: true, spinning: true })
+      }
     } catch (err) {}
 
     if (onPlay) onPlay(track)
@@ -255,7 +295,15 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
                     try {
                       const current = trackRef.current
                       const myId = current?._id || current?.id
+                      if (current && Array.isArray(current.tracks) && current.tracks.length > 0) {
+                        current.tracks.forEach(t => {
+                          const cid = String(t.id || t._id || t)
+                          if (cid) setVinylState(cid, { out: false, spinning: false })
+                        })
                         if (myId) setVinylState(String(myId), { out: false, spinning: false })
+                      } else {
+                        if (myId) setVinylState(String(myId), { out: false, spinning: false })
+                      }
                     } catch (err) {}
           } catch (e) {
             setOut(false)

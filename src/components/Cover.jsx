@@ -55,6 +55,25 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     audio.addEventListener('pause', onPause)
     audio.addEventListener('ended', onEnded)
 
+    // initial sync: if a track is already loaded/playing when this component mounts,
+    // reflect that state immediately so navigating between views keeps the correct UI.
+    const sync = () => {
+      try {
+        if (matchesAudioSrc(audio)) {
+          // if the audio for this track is loaded, keep the sleeve out
+          setOut(true)
+          // spinning only when actually playing
+          setSpinning(!audio.paused)
+        } else {
+          setSpinning(false)
+          setOut(false)
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    sync()
+
     return () => {
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('playing', onPlaying)

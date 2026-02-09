@@ -19,14 +19,28 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
       if (onEnded) onEnded()
     }
 
+    // Keep `playing` state in sync with the actual audio element so
+    // external play/pause (from playlist or covers) updates the UI here.
+    const onPlay = () => setPlaying(true)
+    const onPause = () => setPlaying(false)
+
     audio.addEventListener('loadedmetadata', onLoaded)
     audio.addEventListener('timeupdate', onTime)
     audio.addEventListener('ended', onEnd)
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('playing', onPlay)
+    audio.addEventListener('pause', onPause)
+
+    // initial sync
+    setPlaying(!audio.paused)
 
     return () => {
       audio.removeEventListener('loadedmetadata', onLoaded)
       audio.removeEventListener('timeupdate', onTime)
       audio.removeEventListener('ended', onEnd)
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('playing', onPlay)
+      audio.removeEventListener('pause', onPause)
     }
   }, [onEnded])
 

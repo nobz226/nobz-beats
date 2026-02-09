@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import vinylImg from '../../covers/images/default.png'
 
 // Reusable cover component with vinyl that pops out and spins while playback
 export default function Cover({ track, onPlay, className, sleeveImage }) {
@@ -29,7 +30,16 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     if (!audio || !trackRef.current) return false
     try {
       const a = audio.src || ''
-      const t = trackRef.current.src || ''
+      const current = trackRef.current
+      // If this is an album (has tracks), match any track src
+      if (current && Array.isArray(current.tracks) && current.tracks.length > 0) {
+        return current.tracks.some(tt => {
+          const ts = tt?.src || ''
+          if (!ts) return false
+          return a.endsWith(ts) || a.includes(ts)
+        })
+      }
+      const t = current.src || ''
       if (!t) return false
       return a.endsWith(t) || a.includes(t)
     } catch (e) {
@@ -206,7 +216,7 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
         <div className="vinyl__shadow" />
         <div
           className={["vinyl__circle", spinning ? 'vinyl__circle--spin' : ''].join(' ')}
-          style={{ backgroundImage: `url(${track?.artwork || '/artwork/default.png'})` }}
+          style={{ backgroundImage: `url(${vinylImg})` }}
         />
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, currentTrackId }) {
+export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, currentTrackId, currentTrack }) {
   // tracks passed from app state (playlist)
   const [durations, setDurations] = useState({})
   // load durations for playlist tracks
@@ -35,6 +35,28 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
   }, [tracks])
 
   const ref = useRef(null)
+
+  // Track global audio element state so each item can reflect play/pause
+  const [audioState, setAudioState] = useState({ src: '', paused: true })
+  useEffect(() => {
+    const audio = document.querySelector('.audio-player audio')
+    if (!audio) return
+    const update = () => setAudioState({ src: audio.src || '', paused: audio.paused })
+    audio.addEventListener('play', update)
+    audio.addEventListener('playing', update)
+    audio.addEventListener('pause', update)
+    audio.addEventListener('ended', update)
+    // also update on loadedmetadata in case src changes
+    audio.addEventListener('loadedmetadata', update)
+    update()
+    return () => {
+      audio.removeEventListener('play', update)
+      audio.removeEventListener('playing', update)
+      audio.removeEventListener('pause', update)
+      audio.removeEventListener('ended', update)
+      audio.removeEventListener('loadedmetadata', update)
+    }
+  }, [tracks])
 
   useEffect(() => {
     const updatePos = () => {
@@ -107,6 +129,15 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
 
   return (
     <aside ref={ref} className="playlist" aria-label="Playlist">
+      {currentTrack && (
+        <div className="currently-playing" aria-label="Currently playing">
+          <img className="currently-playing-art" src={currentTrack.artwork || '/artwork/default.png'} alt="Artwork" />
+          <div className="currently-playing-meta">
+            <div className="currently-playing-title">{currentTrack.title}</div>
+            <div className="currently-playing-sub muted">{currentTrack.album ? `${currentTrack.album} — ${currentTrack.title}` : currentTrack.artist}</div>
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 className="cal-sans-title" style={{ fontSize: '18px', margin: 0 }}>Playlist</h3>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -125,8 +156,33 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
                 <div className="playlist-meta cutive-mono-regular">{t.artist} · {durations[t.id] || t.duration || '0:00'}</div>
               </div>
               <div style={{ display: 'flex', gap: 8, marginLeft: 8 }}>
-                <button className="btn" aria-label="Play item" onClick={() => onSelect && onSelect(t)}>▶</button>
-                <button className="btn" aria-label="Add to playlist" onClick={() => onAdd && onAdd(t)}>＋</button>
+                {(() => {
+                  const isThisPlaying = currentTrackId === t.id && !audioState.paused
+                  return (
+                    <button
+                      className="btn"
+                      aria-label={isThisPlaying ? 'Pause' : 'Play'}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        const audio = document.querySelector('.audio-player audio')
+                        if (!audio) {
+                          if (onSelect) onSelect(t)
+                          return
+                        }
+                        const a = audio.src || ''
+                        const s = t.src || ''
+                        const isMatch = s && (a.endsWith(s) || a.includes(s))
+                        if (isMatch) {
+                          if (!audio.paused) audio.pause()
+                          else audio.play().catch(() => {})
+                          return
+                        }
+                        if (onSelect) onSelect(t)
+                        setTimeout(() => { try { audio.play().catch(() => {}) } catch (e) {} }, 50)
+                      }}
+                    >{isThisPlaying ? '⏸' : '▶'}</button>
+                  )
+                })()}
               </div>
             </div>
           </li>

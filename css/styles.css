@@ -516,6 +516,20 @@ body {
   animation: playlist-slide var(--playlist-fade) cubic-bezier(.22,.8,.25,1) forwards;
   animation-delay: calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + .72s + var(--title-fade) + var(--player-gap) + var(--player-fade) + var(--playlist-gap));
 }
+
+/* Currently playing block at top of playlist */
+.currently-playing {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0 0.75rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  margin-bottom: 0.5rem;
+}
+.currently-playing-art { width: 3.25rem; height: 3.25rem; object-fit: cover; border-radius: 0.375rem }
+.currently-playing-meta { display: flex; flex-direction: column }
+.currently-playing-title { font-weight: 700; font-size: 0.95rem }
+.currently-playing-sub { font-size: 0.8rem; opacity: 0.9 }
 /* scrollbar styling for WebKit */
 .playlist::-webkit-scrollbar { width: 0.625rem; }
 .playlist::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 0.5rem; }

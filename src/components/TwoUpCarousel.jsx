@@ -16,11 +16,14 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
   const next = () => setIndex(i => clampIndex(i + step))
 
   // build a two-item window, wrapping when needed
+  // return objects with the original child and a stable index so we can
+  // derive a stable key (avoid remounting when carousel slides)
   const windowItems = () => {
-    if (len <= step) return items
+    if (len <= step) return items.map((c, idx) => ({ child: c, srcIndex: idx }))
     const out = []
     for (let k = 0; k < step; k++) {
-      out.push(items[clampIndex(index + k)])
+      const srcIdx = clampIndex(index + k)
+      out.push({ child: items[srcIdx], srcIndex: srcIdx })
     }
     return out
   }
@@ -29,11 +32,16 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
     <div className={`two-up-carousel ${className}`.trim()}>
       <button className="carousel-arrow carousel-arrow--left" aria-label="Previous" onClick={prev}>◀</button>
       <div className="carousel-track">
-        {windowItems().map((child, i) => (
-          <div key={i} className="carousel-slot">
-            {child}
-          </div>
-        ))}
+        {windowItems().map(({ child, srcIndex }) => {
+          const stableKey = child && child.key != null
+            ? child.key
+            : (child?.props?.track?._id || child?.props?.track?.id || String(srcIndex))
+          return (
+            <div key={stableKey} className="carousel-slot">
+              {child}
+            </div>
+          )
+        })}
       </div>
       <button className="carousel-arrow carousel-arrow--right" aria-label="Next" onClick={next}>▶</button>
     </div>

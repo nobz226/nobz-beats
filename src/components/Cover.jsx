@@ -8,6 +8,7 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
   const [spinning, setSpinning] = useState(false)
   const trackRef = useRef(track)
   const rootRef = useRef(null)
+  const vinylUnsubRef = useRef(null)
 
   // Use centralized vinyl store (via `src/lib/vinyl`) for shared state
 
@@ -50,14 +51,13 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     }
   }
 
+  // Mount audio listeners once; subscription to vinyl store is handled
+  // separately per-track so that when `track` prop changes we re-subscribe
   useEffect(() => {
-    // Listen to the player audio element in the page (Player renders .audio-player audio)
     const audio = document.querySelector('.audio-player audio')
-    if (!audio) return // nothing to do until audio exists
+    if (!audio) return
 
     const onPlay = () => {
-      // When any play starts on the page: if it matches this track, spin and ensure it's out;
-      // otherwise retract this cover and stop spinning so only the active track shows spinning vinyl.
       if (matchesAudioSrc(audio)) {
         setSpinning(true)
         setOut(true)
@@ -67,32 +67,51 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
       }
     }
     const onPlaying = onPlay
+    const onPause = () => { if (matchesAudioSrc(audio)) setSpinning(false) }
+    const onEnded = () => { if (matchesAudioSrc(audio)) { setSpinning(false); setOut(false) } }
 
-    const onPause = () => {
-      if (matchesAudioSrc(audio)) setSpinning(false)
-    }
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('playing', onPlaying)
+    audio.addEventListener('pause', onPause)
+    audio.addEventListener('ended', onEnded)
 
-    const onEnded = () => {
+    // initial sync with audio element
+    try {
       if (matchesAudioSrc(audio)) {
-        setSpinning(false)
-        setOut(false)
+        setOut(true)
+        setSpinning(!audio.paused)
       }
-    }
+    } catch (e) {}
 
-    // Subscribe to centralized vinyl state for this track
-    const myId = (trackRef.current?._id || trackRef.current?.id)
-    let unsubscribe = null
+    return () => {
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('playing', onPlaying)
+      audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('ended', onEnded)
+    }
+  }, [])
+
+  // Subscribe/unsubscribe to vinyl store whenever the `track` prop (id) changes.
+  useEffect(() => {
+    const myId = (track && ((track._id || track.id)))
+    // cleanup previous
+    try {
+      if (vinylUnsubRef.current) {
+        vinylUnsubRef.current()
+        vinylUnsubRef.current = null
+      }
+    } catch (e) {}
+
     if (myId) {
-      // apply any existing store state first
       try {
         const s = getVinylState(String(myId))
         if (s) {
           if (typeof s.out === 'boolean') setOut(s.out)
           if (typeof s.spinning === 'boolean') setSpinning(s.spinning)
         }
-      } catch (err) {}
+      } catch (e) {}
 
-      unsubscribe = subscribeToVinyl(String(myId), (detail) => {
+      vinylUnsubRef.current = subscribeToVinyl(String(myId), (detail) => {
         try {
           const { out: o, spinning: s } = detail || {}
           if (typeof o === 'boolean') setOut(o)
@@ -103,42 +122,16 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
           }
         } catch (err) {}
       })
+    } else {
+      // no id: reset UI
+      setOut(false)
+      setSpinning(false)
     }
-
-    audio.addEventListener('play', onPlay)
-    audio.addEventListener('playing', onPlaying)
-    audio.addEventListener('pause', onPause)
-    audio.addEventListener('ended', onEnded)
-
-    // initial sync: if a track is already loaded/playing when this component mounts,
-    // reflect that state immediately so navigating between views keeps the correct UI.
-    const sync = () => {
-      try {
-        if (matchesAudioSrc(audio)) {
-          // if the audio for this track is loaded, keep the sleeve out
-          setOut(true)
-          // spinning only when actually playing
-          setSpinning(!audio.paused)
-        } else {
-          setSpinning(false)
-          setOut(false)
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-    sync()
-
-    // (initial sync handled above via `getVinylState`)
 
     return () => {
-      audio.removeEventListener('play', onPlay)
-      audio.removeEventListener('playing', onPlaying)
-      audio.removeEventListener('pause', onPause)
-      audio.removeEventListener('ended', onEnded)
-      if (unsubscribe) unsubscribe()
+      try { if (vinylUnsubRef.current) { vinylUnsubRef.current(); vinylUnsubRef.current = null } } catch (e) {}
     }
-  }, [])
+  }, [track && (track._id || track.id)])
 
   const handleClick = (e) => {
     e.stopPropagation()

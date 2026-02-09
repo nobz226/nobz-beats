@@ -5,8 +5,24 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
   const [out, setOut] = useState(false)
   const [spinning, setSpinning] = useState(false)
   const trackRef = useRef(track)
+  const rootRef = useRef(null)
 
   useEffect(() => { trackRef.current = track }, [track])
+
+  useEffect(() => {
+    return () => {
+      try {
+        if (rootRef.current) {
+          rootRef.current.style.setProperty('--parallax-sleeve-x', '0px')
+          rootRef.current.style.setProperty('--parallax-sleeve-y', '0px')
+          rootRef.current.style.setProperty('--parallax-vinyl-x', '0px')
+          rootRef.current.style.setProperty('--parallax-vinyl-y', '0px')
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    }
+  }, [])
 
   // helper: whether the global audio element src corresponds to this track
   const matchesAudioSrc = (audio) => {
@@ -111,8 +127,63 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     if (onPlay) onPlay(track)
   }
 
+  const handlePointerMove = (e) => {
+    // Only apply for mouse/pen to avoid touch noise
+    if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') return
+    const el = rootRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    const dx = (e.clientX - cx) / rect.width // roughly -0.5..0.5
+    const dy = (e.clientY - cy) / rect.height
+
+    const maxSleeve = 10 // px
+    const maxVinyl = 18 // px
+    const maxTilt = 25 // degrees for rotateX/rotateY
+
+    const sx = (dx * maxSleeve).toFixed(2) + 'px'
+    const sy = (dy * maxSleeve).toFixed(2) + 'px'
+    const vx = (dx * maxVinyl).toFixed(2) + 'px'
+    const vy = (dy * maxVinyl).toFixed(2) + 'px'
+
+    // tilt: rotateX based on vertical movement (invert so pointer up tilts away),
+    // rotateY based on horizontal movement
+    const rotX = (-dy * maxTilt).toFixed(2) + 'deg'
+    const rotY = (dx * maxTilt).toFixed(2) + 'deg'
+
+    el.style.setProperty('--parallax-sleeve-x', sx)
+    el.style.setProperty('--parallax-sleeve-y', sy)
+    el.style.setProperty('--parallax-vinyl-x', vx)
+    el.style.setProperty('--parallax-vinyl-y', vy)
+    el.style.setProperty('--parallax-tilt-x', rotX)
+    el.style.setProperty('--parallax-tilt-y', rotY)
+  }
+
+  const handlePointerLeave = () => {
+    const el = rootRef.current
+    if (!el) return
+    el.style.setProperty('--parallax-sleeve-x', '0px')
+    el.style.setProperty('--parallax-sleeve-y', '0px')
+    el.style.setProperty('--parallax-vinyl-x', '0px')
+    el.style.setProperty('--parallax-vinyl-y', '0px')
+    el.style.setProperty('--parallax-tilt-x', '0deg')
+    el.style.setProperty('--parallax-tilt-y', '0deg')
+  }
+
   return (
-    <div className={['cover', className].filter(Boolean).join(' ')} role="button" tabIndex={0} onClick={handleClick} aria-pressed={String(spinning)} aria-label={`Cover ${track?.title || ''}`}>
+    <div
+      ref={rootRef}
+      className={['cover', className].filter(Boolean).join(' ')}
+      role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+      onPointerCancel={handlePointerLeave}
+      aria-pressed={String(spinning)}
+      aria-label={`Cover ${track?.title || ''}`}
+    >
       {/* Sleeve: use provided sleeveImage or fallback to solid black */}
       <div
         className="cover__artwork"

@@ -26,7 +26,8 @@
   height: 20rem;
   cursor: pointer;
   user-select: none;
-  background-image: url("/artwork/single.jpg");
+  background: transparent;
+  perspective: 900px; /* enable 3D transforms for children */
 }
 .cover:focus-visible { outline: 2px solid rgba(255,255,255,0.9); outline-offset: 4px }
 .cover__artwork {
@@ -38,6 +39,14 @@
   box-shadow: 0 8px 22px rgba(0,0,0,0.5);
   position: relative;
   z-index: 20; /* ensure sleeve sits above vinyl */
+}
+
+/* Parallax variables: `--parallax-sleeve-x/y` and `--parallax-vinyl-x/y` set by JS. */
+.cover__artwork {
+  transform: translate(var(--parallax-sleeve-x, 0px), var(--parallax-sleeve-y, 0px)) rotateX(var(--parallax-tilt-x, 0deg)) rotateY(var(--parallax-tilt-y, 0deg));
+  transition: transform 180ms cubic-bezier(.2,.8,.2,1);
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .cover__logo {
@@ -63,12 +72,13 @@
   /* center vinyl under the sleeve by default */
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  /* include parallax offsets (set via JS) */
+  transform: translate(calc(-50% + var(--parallax-vinyl-x, 0px)), calc(-50% + var(--parallax-vinyl-y, 0px))) rotateX(var(--parallax-tilt-x, 0deg)) rotateY(var(--parallax-tilt-y, 0deg));
   transition: transform .32s cubic-bezier(.2,.9,.2,1);
   z-index: 5; /* behind sleeve */
 }
 /* visible: shift right so vinyl protrudes by --vinyl-protrude from the right edge */
-.vinyl--visible { transform: translate(calc(-50% + var(--vinyl-protrude)), -50%) }
+.vinyl--visible { transform: translate(calc(-50% + var(--vinyl-protrude) + var(--parallax-vinyl-x, 0px)), calc(-50% + var(--parallax-vinyl-y, 0px))) rotateX(var(--parallax-tilt-x, 0deg)) rotateY(var(--parallax-tilt-y, 0deg)); }
 
 .vinyl__circle,
 .vinyl__shadow { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 50% }
@@ -76,6 +86,10 @@
 .vinyl__circle { background-size: cover; background-position: center center; background-repeat: no-repeat; z-index: 4; transform-origin: 50% 50%; background-color: transparent; box-shadow: none; border: none }
 
 .vinyl__circle--spin { animation: cover-rotate 1s linear infinite; }
+
+/* Slight vinyl tilt opposite to sleeve for depth */
+.vinyl { will-change: transform; }
+
 
 @keyframes cover-rotate { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
 

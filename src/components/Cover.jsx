@@ -250,7 +250,10 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
         aria-hidden="true"
         style={sleeveImage ? { backgroundImage: `url(${sleeveImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
       >
-        <img src="/logo/logoSVG.svg" className="cover__logo" alt="" aria-hidden="true" />
+        {/* Hide the floating logo for album covers (they have a `tracks` array) */}
+        {!(track && Array.isArray(track.tracks) && track.tracks.length > 0) && (
+          <img src="/logo/logoSVG.svg" className="cover__logo" alt="" aria-hidden="true" />
+        )}
       </div>
 
       <div

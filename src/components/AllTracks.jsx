@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { setVinylState } from '../lib/vinyl'
+import { playVinyl, pauseVinyl } from '../lib/vinyl'
 
 export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackId }) {
   const items = allTracks
@@ -60,14 +60,12 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
                         if (!audio.paused) {
                           audio.pause()
                           try {
-                            setVinylState(String(it.id || it._id), { spinning: false })
-                            if (it.albumId) setVinylState(String(it.albumId), { spinning: false })
+                            pauseVinyl(String(it.id || it._id), it.albumId)
                           } catch (e) {}
                         } else {
                           audio.play().catch(() => {})
                           try {
-                            setVinylState(String(it.id || it._id), { out: true, spinning: true })
-                            if (it.albumId) setVinylState(String(it.albumId), { out: true, spinning: true })
+                            playVinyl(String(it.id || it._id), it.albumId)
                           } catch (e) {}
                         }
                         return
@@ -75,8 +73,7 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
                       if (onPlay) onPlay(it)
                       setTimeout(() => { try { audio.play().catch(() => {}) } catch (e) {} }, 50)
                       try {
-                        setVinylState(String(it.id || it._id), { out: true, spinning: true })
-                        if (it.albumId) setVinylState(String(it.albumId), { out: true, spinning: true })
+                        playVinyl(String(it.id || it._id), it.albumId)
                       } catch (e) {}
                     }}
                   >{isThisPlaying ? '⏸' : '▶'}</button>

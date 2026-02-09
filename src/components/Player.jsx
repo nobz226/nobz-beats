@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { setVinylState } from '../lib/vinyl'
+import { playVinyl, pauseVinyl, stopVinyl } from '../lib/vinyl'
 
 // Simple audio player — replace the sample track with real sources as needed
 export default function Player({ track, onNext, onPrev, onEnded }) {
@@ -25,8 +25,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
         const id = (track && ((track._id || track.id)))
         const albumId = track && track.albumId
         if (id) {
-          setVinylState(String(id), { spinning: false })
-          if (albumId) setVinylState(String(albumId), { spinning: false })
+          pauseVinyl(String(id), albumId)
         }
 
         // schedule a short delayed retraction only if playback doesn't move
@@ -47,8 +46,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
             const lastId = audio._lastTrackId
             if (String(lastId) === String(prevId) && audio.paused) {
               try {
-                if (id) setVinylState(String(id), { out: false, spinning: false })
-                if (albumId) setVinylState(String(albumId), { out: false, spinning: false })
+                if (id) stopVinyl(String(id), albumId)
               } catch (err) {}
             }
           } catch (err) {}
@@ -66,9 +64,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
       try {
         const id = (track && ((track._id || track.id)))
         if (id) {
-          setVinylState(String(id), { out: true, spinning: true })
-          const albumId = track && track.albumId
-          if (albumId) setVinylState(String(albumId), { out: true, spinning: true })
+          playVinyl(String(id), albumId)
         }
       } catch (err) {}
     }
@@ -76,9 +72,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
       try {
         const id = (track && ((track._id || track.id)))
         if (id) {
-          setVinylState(String(id), { spinning: false })
-          const albumId = track && track.albumId
-          if (albumId) setVinylState(String(albumId), { spinning: false })
+          pauseVinyl(String(id), albumId)
         }
       } catch (err) {}
     }
@@ -134,11 +128,11 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
       const newId = (track && ((track._id || track.id)))
       const newAlbumId = (track && track.albumId)
       if (prevId && String(prevId) !== String(newId)) {
-        setVinylState(String(prevId), { out: false, spinning: false })
+        stopVinyl(String(prevId), prevAlbumId)
       }
       // If we switched albums, retract the previous album sleeve as well
       if (prevAlbumId && newAlbumId && String(prevAlbumId) !== String(newAlbumId)) {
-        try { setVinylState(String(prevAlbumId), { out: false, spinning: false }) } catch (e) {}
+        try { stopVinyl(String(prevAlbumId)) } catch (e) {}
       }
     } catch (err) {}
 
@@ -150,8 +144,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
     try {
       const id = track && ((track._id || track.id))
       const albumId = track && track.albumId
-      if (id) setVinylState(String(id), { out: true, spinning: true })
-      if (albumId) setVinylState(String(albumId), { out: true, spinning: true })
+      if (id) playVinyl(String(id), albumId)
     } catch (e) {}
     // attempt to autoplay on track change
     audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
@@ -172,14 +165,12 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
         audio.pause()
         setPlaying(false)
         try {
-          if (id) setVinylState(String(id), { spinning: false })
-          if (albumId) setVinylState(String(albumId), { spinning: false })
+          if (id) pauseVinyl(String(id), albumId)
         } catch (e) {}
       } else {
         // play: show sleeve and start spinning immediately (match playlist behavior)
         try {
-          if (id) setVinylState(String(id), { out: true, spinning: true })
-          if (albumId) setVinylState(String(albumId), { out: true, spinning: true })
+          if (id) playVinyl(String(id), albumId)
         } catch (e) {}
         await audio.play()
         setPlaying(true)

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Cover from './Cover'
 import TwoUpCarousel from './TwoUpCarousel'
-import { setVinylState } from '../lib/vinyl'
+import { playVinyl, pauseVinyl } from '../lib/vinyl'
 
 export function RemixItem({ track, onPlay, onAdd }) {
   const t = track || {
@@ -45,14 +45,14 @@ export function RemixItem({ track, onPlay, onAdd }) {
     if (audio && matchesAudioSrc(audio)) {
       if (!audio.paused) {
         audio.pause()
-        try { setVinylState(String(t.id || t._id), { spinning: false }) } catch (e) {}
+        try { pauseVinyl(String(t.id || t._id)) } catch (e) {}
       } else {
         await audio.play().catch(() => {})
-        try { setVinylState(String(t.id || t._id), { out: true, spinning: true }) } catch (e) {}
+        try { playVinyl(String(t.id || t._id)) } catch (e) {}
       }
       return
     }
-    try { setVinylState(String(t.id || t._id), { out: true, spinning: true }) } catch (e) {}
+    try { playVinyl(String(t.id || t._id)) } catch (e) {}
     if (onPlay) onPlay(t)
     if (audio) setTimeout(() => audio.play().catch(() => {}), 50)
   }

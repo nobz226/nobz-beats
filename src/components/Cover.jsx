@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import vinylImg from '../../covers/images/default.png'
-import { setVinylState, getVinylState, subscribeToVinyl } from '../lib/vinyl'
+import { getVinylState, subscribeToVinyl, playVinyl, pauseVinyl, stopVinyl } from '../lib/vinyl'
 
 // Reusable cover component with vinyl that pops out and spins while playback
 export default function Cover({ track, onPlay, className, sleeveImage }) {
@@ -151,10 +151,17 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     e.stopPropagation()
     // If this track is currently loaded in the global audio element -> toggle play/pause
     const audio = document.querySelector('.audio-player audio')
+    const id = (track && ((track._id || track.id)))
+    const albumId = (track && Array.isArray(track.tracks) && track.tracks.length > 0) ? id : (track && track.albumId)
+
     if (audio && matchesAudioSrc(audio)) {
       if (audio.paused) {
+        // play and mark vinyl
+        try { playVinyl(String(id), albumId) } catch (e) {}
         audio.play().catch(() => {})
       } else {
+        // pause and mark vinyl (stop spinning; keep sleeve out)
+        try { pauseVinyl(String(id), albumId) } catch (e) {}
         audio.pause()
       }
       // ensure the sleeve is out when toggling play
@@ -162,21 +169,10 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
       return
     }
 
-    // If different track or no audio yet: request parent to play this track and try to autoplay
+    // If different track or no audio yet: request primary id to play and try to autoplay
     setOut(true)
-    // update global vinyl state for this item
     try {
-      const id = (track && ((track._id || track.id)))
-      if (track && Array.isArray(track.tracks) && track.tracks.length > 0) {
-        // album: set state for each child track id so Player updates match
-        track.tracks.forEach(t => {
-          const cid = String(t.id || t._id || t)
-          if (cid) setVinylState(cid, { out: true, spinning: true })
-        })
-        if (id) setVinylState(String(id), { out: true, spinning: true })
-      } else {
-        if (id) setVinylState(String(id), { out: true, spinning: true })
-      }
+      if (id) playVinyl(String(id), albumId)
     } catch (err) {}
 
     if (onPlay) onPlay(track)
@@ -281,15 +277,7 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
                     try {
                       const current = trackRef.current
                       const myId = current?._id || current?.id
-                      if (current && Array.isArray(current.tracks) && current.tracks.length > 0) {
-                        current.tracks.forEach(t => {
-                          const cid = String(t.id || t._id || t)
-                          if (cid) setVinylState(cid, { out: false, spinning: false })
-                        })
-                        if (myId) setVinylState(String(myId), { out: false, spinning: false })
-                      } else {
-                        if (myId) setVinylState(String(myId), { out: false, spinning: false })
-                      }
+                      if (myId) stopVinyl(String(myId))
                     } catch (err) {}
           } catch (e) {
             setOut(false)

@@ -40,4 +40,28 @@ export function subscribeToVinyl(id, callback) {
   return () => bus.removeEventListener('vinyl:state', handler)
 }
 
-export default { setVinylState, getVinylState, subscribeToVinyl }
+export function playVinyl(id, albumId) {
+  try {
+    if (!id) return
+    setVinylState(String(id), { out: true, spinning: true })
+    if (albumId && String(albumId) !== String(id)) setVinylState(String(albumId), { out: true, spinning: true })
+  } catch (e) {}
+}
+
+export function pauseVinyl(id, albumId) {
+  try {
+    if (!id) return
+    setVinylState(String(id), { spinning: false })
+    if (albumId && String(albumId) !== String(id)) setVinylState(String(albumId), { spinning: false })
+  } catch (e) {}
+}
+
+export function stopVinyl(id, albumId) {
+  try {
+    if (!id) return
+    setVinylState(String(id), { out: false, spinning: false })
+    if (albumId && String(albumId) !== String(id)) setVinylState(String(albumId), { out: false, spinning: false })
+  } catch (e) {}
+}
+
+export default { setVinylState, getVinylState, subscribeToVinyl, playVinyl, pauseVinyl, stopVinyl }

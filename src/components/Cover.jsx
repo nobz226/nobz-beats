@@ -8,6 +8,12 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
   const trackRef = useRef(track)
   const rootRef = useRef(null)
 
+  // Ensure a global vinyl state map exists so carousel/unmounted components
+  // can maintain and share vinyl out/spinning state across instances.
+  if (typeof window !== 'undefined' && !window.__vinylState) {
+    window.__vinylState = {}
+  }
+
   useEffect(() => { trackRef.current = track }, [track])
 
   useEffect(() => {
@@ -76,10 +82,32 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
       }
     }
 
+    const onVinylState = (e) => {
+      try {
+        const { id, out: o, spinning: s } = e?.detail || {}
+        const current = trackRef.current
+        const myId = current?._id || current?.id
+        if (!id || !myId) return
+        if (String(id) === String(myId)) {
+          // apply state from global message
+          if (typeof o === 'boolean') setOut(o)
+          if (typeof s === 'boolean') setSpinning(s)
+          // if audio was playing for this id but vinyl was retracted, pause
+          if (o === false && s === false) {
+            const audioEl = document.querySelector('.audio-player audio')
+            if (audioEl && matchesAudioSrc(audioEl) && !audioEl.paused) audioEl.pause()
+          }
+        }
+      } catch (err) {
+        /* ignore */
+      }
+    }
+
     audio.addEventListener('play', onPlay)
     audio.addEventListener('playing', onPlaying)
     audio.addEventListener('pause', onPause)
     audio.addEventListener('ended', onEnded)
+    window.addEventListener('vinyl:state', onVinylState)
 
     // initial sync: if a track is already loaded/playing when this component mounts,
     // reflect that state immediately so navigating between views keeps the correct UI.
@@ -100,11 +128,27 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     }
     sync()
 
+    // Apply any existing global vinyl state for this item so remounted
+    // covers (for example when the carousel cycles) restore the same
+    // out/spinning state from earlier interactions.
+    try {
+      const current = trackRef.current
+      const myId = current?._id || current?.id
+      if (myId && typeof window !== 'undefined' && window.__vinylState && window.__vinylState[String(myId)]) {
+        const s = window.__vinylState[String(myId)]
+        if (typeof s.out === 'boolean') setOut(s.out)
+        if (typeof s.spinning === 'boolean') setSpinning(s.spinning)
+      }
+    } catch (e) {
+      // ignore
+    }
+
     return () => {
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('playing', onPlaying)
       audio.removeEventListener('pause', onPause)
       audio.removeEventListener('ended', onEnded)
+      window.removeEventListener('vinyl:state', onVinylState)
     }
   }, [])
 
@@ -125,6 +169,15 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
 
     // If different track or no audio yet: request parent to play this track and try to autoplay
     setOut(true)
+    // update global vinyl state for this item
+    try {
+      const id = (track && ((track._id || track.id)))
+      if (id) {
+        window.__vinylState[String(id)] = { out: true, spinning: true }
+        window.dispatchEvent(new CustomEvent('vinyl:state', { detail: { id, out: true, spinning: true } }))
+      }
+    } catch (err) {}
+
     if (onPlay) onPlay(track)
     // attempt to play if audio exists (Player will set src on track change)
     if (audio) {
@@ -209,8 +262,29 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
         onClick={(e) => {
           // clicking the vinyl itself should not trigger cover click
           e.stopPropagation()
-          // only retract the vinyl when it's not spinning
-          if (!spinning) setOut(false)
+          try {
+            // retract the sleeve
+            setOut(false)
+            // if it was spinning for the current track, pause playback and stop spinning
+                    if (spinning) {
+                      const audio = document.querySelector('.audio-player audio')
+                      if (audio && matchesAudioSrc(audio) && !audio.paused) {
+                        audio.pause()
+                      }
+                      setSpinning(false)
+                    }
+                    // update global state and notify other covers
+                    try {
+                      const current = trackRef.current
+                      const myId = current?._id || current?.id
+                      if (myId) {
+                        window.__vinylState[String(myId)] = { out: false, spinning: false }
+                        window.dispatchEvent(new CustomEvent('vinyl:state', { detail: { id: myId, out: false, spinning: false } }))
+                      }
+                    } catch (err) {}
+          } catch (e) {
+            setOut(false)
+          }
         }}
       >
         <div className="vinyl__shadow" />

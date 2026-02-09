@@ -3,7 +3,7 @@ import React from 'react'
 export default function Title() {
   return (
     <h1 
-      className="fixed left-[7.8125rem] top-[30%] whitespace-nowrap text-[4.6875rem] font-normal tracking-wider z-[1001] pointer-events-none m-0 p-1 font-rubik opacity-0 text-transparent bg-clip-text"
+      className="fixed left-4 md:left-[7.8125rem] top-[20%] md:top-[30%] whitespace-nowrap text-[2.5rem] md:text-[4.6875rem] font-normal tracking-wider z-[1001] pointer-events-none m-0 p-1 font-rubik opacity-0 text-transparent bg-clip-text"
       style={{
         transformOrigin: 'left center',
         transform: 'translateY(calc(-50% - 1.125rem)) rotate(90deg)',

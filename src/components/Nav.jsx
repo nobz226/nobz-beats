@@ -79,17 +79,17 @@ export default function Nav() {
   }
 
   return (
-    <nav ref={navRef} className="site-nav fixed top-[4.6875rem] right-20 flex gap-4 z-[1002]" aria-label="Primary navigation">
+    <nav ref={navRef} className="site-nav fixed top-4 lg:top-[4.6875rem] right-4 lg:right-20 flex flex-col lg:flex-row items-end lg:items-center gap-4 z-[1002]" aria-label="Primary navigation">
       <button
-        className="hidden relative z-[1102] text-[1.625rem] p-2 cursor-pointer rounded-lg border-none text-white bg-white/[0.03]"
+        className="lg:hidden relative z-[1102] text-[1.625rem] p-2 cursor-pointer rounded-lg border-none text-white bg-white/[0.03] hover:bg-white/[0.08]"
         aria-label={open ? 'Close menu' : 'Open menu'}
         aria-expanded={open}
         onClick={() => setOpen(o => !o)}
       >
-        ☰
+        {open ? '✕' : '☰'}
       </button>
 
-      <div className="flex gap-4 items-center" onClick={onClick}>
+      <div className={`${open ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row gap-4 items-end lg:items-center bg-[#1c1c1c]/95 lg:bg-transparent p-6 lg:p-0 rounded-xl shadow-2xl lg:shadow-none border border-white/[0.05] lg:border-none backdrop-blur-lg lg:backdrop-blur-none z-[1101]`} onClick={onClick}>
         <a href="/singles" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.12s)'}}>&gt;Singles</a>
         <a href="/albums" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.24s)'}}>&gt;Albums</a>
         <a href="/remixes" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.36s)'}}>&gt;Remixes</a>

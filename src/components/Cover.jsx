@@ -210,7 +210,7 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
   return (
     <div
       ref={rootRef}
-      className={`inline-block relative w-80 h-80 cursor-pointer select-none bg-transparent perspective-[900px] focus-visible:outline-2 focus-visible:outline-white/90 focus-visible:outline-offset-4 ${className || ''}`.trim()}
+      className={`inline-block relative w-full max-w-[16rem] md:max-w-[20rem] aspect-square cursor-pointer select-none bg-transparent perspective-[900px] focus-visible:outline-2 focus-visible:outline-white/90 focus-visible:outline-offset-4 ${className || ''}`.trim()}
       role="button"
       tabIndex={0}
       onClick={handleClick}

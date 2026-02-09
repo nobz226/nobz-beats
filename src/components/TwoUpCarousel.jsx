@@ -31,7 +31,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
   return (
     <div className={`relative flex items-center justify-center ${className}`.trim()}>
       <button 
-        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white -left-20" 
+        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white left-0" 
         aria-label="Previous" 
         onClick={prev}
       >
@@ -50,7 +50,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
         })}
       </div>
       <button 
-        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white -right-20" 
+        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white right-0" 
         aria-label="Next" 
         onClick={next}
       >

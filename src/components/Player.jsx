@@ -200,34 +200,34 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
   return (
     <div 
-      className="audio-player fixed left-0 bottom-0 z-[1003] bg-transparent flex items-center justify-center py-2.5 right-[11.25rem] h-[4.5rem]" 
+      className="audio-player fixed left-0 bottom-0 z-[1003] bg-transparent flex items-center justify-center py-2.5 w-full lg:right-[11.25rem] h-auto lg:h-[4.5rem]" 
       role="region" 
       aria-label="Audio player"
     >
       <audio ref={audioRef} src={track.src} preload="metadata" />
 
       <div 
-        className="w-full max-w-[71.875rem] flex items-center justify-between gap-4 py-2 px-3.5 rounded-[0.625rem] pointer-events-auto opacity-0 bg-[#1c1c1c]/95 shadow-[0_0.375rem_1.125rem_rgba(0,0,0,0.5)] border-t border-white/3 translate-y-3 animate-player-drop"
+        className="w-[calc(100%-1rem)] max-w-[71.875rem] flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 py-3 md:py-2 px-3.5 rounded-xl md:rounded-[0.625rem] pointer-events-auto opacity-0 bg-[#1c1c1c]/95 shadow-[0_0.375rem_1.125rem_rgba(0,0,0,0.5)] border border-white/5 translate-y-3 animate-player-drop"
         style={{ animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s + var(--title-fade) + var(--player-gap))' }}
       >
-        <div className="flex items-center gap-3 min-w-[11.25rem]">
-          <img src={track.artwork} alt="Artwork" className="w-14 h-14 object-cover rounded-md" />
-          <div className="flex flex-col">
-            <div className="font-cal-sans font-semibold text-white">{track.title}</div>
-            <div className="font-cutive font-normal text-white/90 text-xs">{track.artist}</div>
+        <div className="flex items-center gap-3 w-full md:min-w-[11.25rem] md:w-auto">
+          <img src={track.artwork} alt="Artwork" className="w-12 h-12 md:w-14 md:h-14 object-cover rounded-md" />
+          <div className="flex flex-col overflow-hidden">
+            <div className="font-cal-sans font-semibold text-white text-sm md:text-base truncate">{track.title}</div>
+            <div className="font-cutive font-normal text-white/90 text-[10px] md:text-xs truncate">{track.artist}</div>
           </div>
         </div>
 
-        <div className="flex items-center">
-          <div className="flex gap-3 items-center mr-3">
-            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Previous" onClick={handlePrev}>⏮</button>
-            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
+        <div className="flex flex-col md:flex-row items-center w-full md:w-auto gap-2 md:gap-4 flex-1">
+          <div className="flex gap-4 items-center justify-center">
+            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Previous" onClick={handlePrev}>⏮</button>
+            <button className="bg-transparent border-none text-white cursor-pointer text-2xl p-1 rounded-md hover:bg-white/[0.04]" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
               {playing ? '⏸' : '▶'}
             </button>
-            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Next" onClick={handleNext}>⏭</button>
+            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Next" onClick={handleNext}>⏭</button>
           </div>
-          <div className="flex items-center gap-2 w-[26.25rem] min-w-[12.5rem]">
-            <span className="font-cutive text-xs text-white/90">{formatTime(currentTime)}</span>
+          <div className="flex items-center gap-2 w-full max-w-md">
+            <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(currentTime)}</span>
             <input
               aria-label="Seek"
               type="range"
@@ -236,15 +236,15 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
               value={currentTime}
               step="0.01"
               onChange={onSeek}
-              className="flex-1 accent-[rgba(255,255,255,0.03)]"
+              className="flex-1 accent-white"
             />
-            <span className="font-cutive text-xs text-white/90">{formatTime(duration)}</span>
+            <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(duration)}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 min-w-20 justify-end">
-          <label className="flex">
-            <span className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0 clip-rect-0">Volume</span>
+        <div className="hidden md:flex items-center gap-2 min-w-20 justify-end">
+          <div className="flex items-center gap-2">
+            <span className="text-white text-base">🔊</span>
             <input
               aria-label="Volume"
               type="range"
@@ -253,9 +253,9 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
               step="0.01"
               value={volume}
               onChange={(e) => setVolume(Number(e.target.value))}
-              className="accent-[rgba(255,255,255,0.03)]"
+              className="w-20 accent-white"
             />
-          </label>
+          </div>
         </div>
       </div>
     </div>

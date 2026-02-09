@@ -72,7 +72,7 @@ export function AlbumItem({ track, onPlayAlbum, onAddAlbum, className = '' }) {
   }
 
   return (
-    <div className={`flex flex-col gap-3 items-center w-[22.5rem] ${className}`.trim()} aria-label={`Album ${a.title}`}>
+    <div className={`flex flex-col gap-3 items-center w-full max-w-[22.5rem] ${className}`.trim()} aria-label={`Album ${a.title}`}>
       <Cover track={a} onPlay={() => onPlayAlbum && onPlayAlbum(a)} className="mr-4" sleeveImage={a.artwork} />
       <div className="font-cutive text-center">
         <strong className="block text-lg font-bold">{a.title}</strong>
@@ -90,30 +90,57 @@ export function AlbumItem({ track, onPlayAlbum, onAddAlbum, className = '' }) {
 // (tracklist/duration loading removed — albums use same simple cover behavior as singles/remixes)
 
 export default function Albums({ tracks = [], onPlayAlbum, onAddAlbum, onPlayTrack, onAddTrack }) {
+  const [isMobile, setIsMobile] = React.useState(false)
+
+  React.useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 1024)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
   return (
     <section 
-      className="latest-section fixed z-[1000] text-white opacity-0 translate-y-2 animate-section-fade"
+      className={`latest-section fixed z-[1000] text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
       style={{
-        left: 'calc(var(--logo-size) + var(--logo-gap) + 1.125rem)',
-        top: '14.375rem',
-        maxWidth: 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
+        left: isMobile ? '0' : 'var(--main-left)',
+        top: 'var(--main-top)',
+        bottom: isMobile ? '8rem' : 'auto',
+        width: isMobile ? '100%' : 'auto',
+        maxWidth: isMobile ? 'none' : 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
         animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'
       }}
       aria-label="Albums"
     >
-      <h2 className="font-cal-sans font-bold text-[1.75rem] m-0 mb-2">Albums</h2>
-      <TwoUpCarousel className="grid gap-24 items-start justify-center mt-3 grid-cols-[repeat(2,22.5rem)]">
-        {tracks.map(t => (
-          <AlbumItem
-            key={t.id}
-            track={t}
-            onPlayAlbum={onPlayAlbum}
-            onAddAlbum={onAddAlbum}
-            onPlayTrack={onPlayTrack}
-            onAddTrack={onAddTrack}
-          />
-        ))}
-      </TwoUpCarousel>
+      <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? 'px-4' : ''}`}>Albums</h2>
+      
+      {!isMobile ? (
+        <TwoUpCarousel className="grid gap-8 md:gap-24 items-start justify-center mt-3 grid-cols-1 lg:grid-cols-[repeat(2,22.5rem)]">
+          {tracks.map(t => (
+            <AlbumItem
+              key={t.id}
+              track={t}
+              onPlayAlbum={onPlayAlbum}
+              onAddAlbum={onAddAlbum}
+              onPlayTrack={onPlayTrack}
+              onAddTrack={onAddTrack}
+            />
+          ))}
+        </TwoUpCarousel>
+      ) : (
+        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col gap-16 mt-6 pb-24 items-center px-4">
+          {tracks.map(t => (
+            <AlbumItem
+              key={`mob-${t.id}`}
+              track={t}
+              onPlayAlbum={onPlayAlbum}
+              onAddAlbum={onAddAlbum}
+              onPlayTrack={onPlayTrack}
+              onAddTrack={onAddTrack}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

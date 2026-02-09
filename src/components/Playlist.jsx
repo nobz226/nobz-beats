@@ -128,13 +128,22 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
     return () => { window.removeEventListener('resize', updatePos); mo.disconnect() }
   }, [])
 
+  const [expanded, setExpanded] = useState(false)
+
   return (
-    <aside 
-      ref={ref} 
-      className="playlist fixed top-[4.6875rem] w-[22.5rem] h-[34.375rem] max-h-[calc(100vh-7.5rem)] overflow-y-auto z-[1002] text-white p-3 rounded-lg opacity-0 left-auto bg-white/[0.03] translate-x-5 animate-playlist-slide font-cutive [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-thumb]:bg-white/[0.06]"
-      style={{ animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s + var(--title-fade) + var(--player-gap) + var(--playlist-gap))' }}
-      aria-label="Playlist"
-    >
+    <>
+      <button 
+        className="lg:hidden fixed bottom-24 right-4 z-[1003] bg-white/[0.05] border border-white/[0.1] text-white p-3 rounded-full backdrop-blur-md shadow-lg"
+        onClick={() => setExpanded(!expanded)}
+        aria-label="Toggle Playlist"
+      >
+        {expanded ? '✕' : '🎵'}
+      </button>
+      <aside 
+        ref={ref} 
+        className={`playlist fixed right-4 lg:right-auto lg:left-auto top-[4.6875rem] w-[calc(100vw-2rem)] md:w-[22.5rem] h-[34.375rem] max-h-[calc(100vh-12rem)] md:max-h-[calc(100vh-7.5rem)] overflow-y-auto overflow-x-hidden custom-scrollbar z-[1002] text-white p-3 rounded-lg bg-[#1c1c1c]/95 lg:bg-white/[0.03] backdrop-blur-xl lg:backdrop-blur-none border border-white/[0.05] lg:border-none shadow-2xl lg:shadow-none transition-all duration-500 ease-[cubic-bezier(0.22,0.8,0.25,1)] ${expanded ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-[120%] opacity-0 pointer-events-none lg:translate-x-0 lg:opacity-100 lg:pointer-events-auto'} font-cutive`}
+        aria-label="Playlist"
+      >
       {currentTrack && (
         <div className="flex gap-3 items-center py-2 pb-3 mb-2 border-b border-white/[0.03]" aria-label="Currently playing">
           <img className="w-[3.25rem] h-[3.25rem] object-cover rounded-md" src={currentTrack.artwork || '/artwork/default.png'} alt="Artwork" />
@@ -208,6 +217,7 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
           </li>
         ))}
       </ul>
-    </aside>
+      </aside>
+    </>
   )
 }

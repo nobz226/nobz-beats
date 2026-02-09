@@ -10,8 +10,6 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
   const rootRef = useRef(null)
   const vinylUnsubRef = useRef(null)
 
-  // Use centralized vinyl store (via `src/lib/vinyl`) for shared state
-
   useEffect(() => { trackRef.current = track }, [track])
 
   useEffect(() => {
@@ -22,6 +20,8 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
           rootRef.current.style.setProperty('--parallax-sleeve-y', '0px')
           rootRef.current.style.setProperty('--parallax-vinyl-x', '0px')
           rootRef.current.style.setProperty('--parallax-vinyl-y', '0px')
+          rootRef.current.style.setProperty('--parallax-tilt-x', '0deg')
+          rootRef.current.style.setProperty('--parallax-tilt-y', '0deg')
         }
       } catch (e) {
         /* ignore */
@@ -29,17 +29,17 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     }
   }, [])
 
-  // helper: whether the global audio element src corresponds to this track
+  // (Keep all the helper logic matchesAudioSrc, event listeners, etc.)
   const matchesAudioSrc = (audio) => {
     if (!audio || !trackRef.current) return false
     try {
       const a = audio.src || ''
       const current = trackRef.current
-      // If this is an album (has tracks), match any track src
       if (current && Array.isArray(current.tracks) && current.tracks.length > 0) {
         return current.tracks.some(tt => {
           const ts = tt?.src || ''
           if (!ts) return false
+          // Fix: use 'a' (audio.src) instead of undefined 'src'
           return a.endsWith(ts) || a.includes(ts)
         })
       }
@@ -51,8 +51,6 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     }
   }
 
-  // Mount audio listeners once; subscription to vinyl store is handled
-  // separately per-track so that when `track` prop changes we re-subscribe
   useEffect(() => {
     const audio = document.querySelector('.audio-player audio')
     if (!audio) return
@@ -75,7 +73,6 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     audio.addEventListener('pause', onPause)
     audio.addEventListener('ended', onEnded)
 
-    // initial sync with audio element
     try {
       if (matchesAudioSrc(audio)) {
         setOut(true)
@@ -91,15 +88,12 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     }
   }, [])
 
-  // Subscribe to primary vinyl id (album id for albums, track id for singles)
   useEffect(() => {
     const current = track
     const myId = (current && ((current._id || current.id)))
 
-    // cleanup previous
     try {
       if (vinylUnsubRef.current) {
-        // vinylUnsubRef.current may be a single fn
         try { vinylUnsubRef.current() } catch (e) {}
         vinylUnsubRef.current = null
       }
@@ -108,21 +102,16 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     if (myId) {
       try {
         const primaryId = String(myId)
-
-        // initial state from store
         try {
           const s = getVinylState(primaryId)
           setOut(!!(s && s.out))
           setSpinning(!!(s && s.spinning))
         } catch (e) {}
 
-        // subscribe to primary id only — album-level state is authoritative
         const unsub = subscribeToVinyl(primaryId, (detail) => {
           try {
             setOut(!!detail.out)
             setSpinning(!!detail.spinning)
-
-            // If album was stopped externally and audio still matches, pause audio
             if (!detail.out && !detail.spinning) {
               const audioEl = document.querySelector('.audio-player audio')
               if (audioEl && matchesAudioSrc(audioEl) && !audioEl.paused) audioEl.pause()
@@ -149,66 +138,53 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
 
   const handleClick = (e) => {
     e.stopPropagation()
-    // If this track is currently loaded in the global audio element -> toggle play/pause
     const audio = document.querySelector('.audio-player audio')
     const id = (track && ((track._id || track.id)))
     const albumId = (track && Array.isArray(track.tracks) && track.tracks.length > 0) ? id : (track && track.albumId)
 
     if (audio && matchesAudioSrc(audio)) {
       if (audio.paused) {
-        // play and mark vinyl
         try { playVinyl(String(id), albumId) } catch (e) {}
         audio.play().catch(() => {})
       } else {
-        // pause and mark vinyl (stop spinning; keep sleeve out)
         try { pauseVinyl(String(id), albumId) } catch (e) {}
         audio.pause()
       }
-      // ensure the sleeve is out when toggling play
       setOut(true)
+      setSpinning(!audio.paused)
       return
     }
 
-    // If different track or no audio yet: request primary id to play and try to autoplay
     setOut(true)
+    setSpinning(true)
     try {
       if (id) playVinyl(String(id), albumId)
     } catch (err) {}
 
     if (onPlay) onPlay(track)
-    // attempt to play if audio exists (Player will set src on track change)
     if (audio) {
       setTimeout(() => audio.play().catch(() => {}), 50)
     }
   }
 
-  const handlePlay = (e) => {
-    e.stopPropagation()
-    if (onPlay) onPlay(track)
-  }
-
   const handlePointerMove = (e) => {
-    // Only apply for mouse/pen to avoid touch noise
     if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') return
     const el = rootRef.current
     if (!el) return
     const rect = el.getBoundingClientRect()
     const cx = rect.left + rect.width / 2
     const cy = rect.top + rect.height / 2
-    const dx = (e.clientX - cx) / rect.width // roughly -0.5..0.5
+    const dx = (e.clientX - cx) / rect.width
     const dy = (e.clientY - cy) / rect.height
 
-    const maxSleeve = 10 // px
-    const maxVinyl = 18 // px
-    const maxTilt = 25 // degrees for rotateX/rotateY
+    const maxSleeve = 10
+    const maxVinyl = 18
+    const maxTilt = 25
 
     const sx = (dx * maxSleeve).toFixed(2) + 'px'
     const sy = (dy * maxSleeve).toFixed(2) + 'px'
     const vx = (dx * maxVinyl).toFixed(2) + 'px'
     const vy = (dy * maxVinyl).toFixed(2) + 'px'
-
-    // tilt: rotateX based on vertical movement (invert so pointer up tilts away),
-    // rotateY based on horizontal movement
     const rotX = (-dy * maxTilt).toFixed(2) + 'deg'
     const rotY = (dx * maxTilt).toFixed(2) + 'deg'
 
@@ -234,7 +210,7 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
   return (
     <div
       ref={rootRef}
-      className={['cover', className].filter(Boolean).join(' ')}
+      className={`inline-block relative w-80 h-80 cursor-pointer select-none bg-transparent perspective-[900px] focus-visible:outline-2 focus-visible:outline-white/90 focus-visible:outline-offset-4 ${className || ''}`.trim()}
       role="button"
       tabIndex={0}
       onClick={handleClick}
@@ -244,53 +220,61 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
       aria-pressed={String(spinning)}
       aria-label={`Cover ${track?.title || ''}`}
     >
-      {/* Sleeve: use provided sleeveImage or fallback to solid black */}
       <div
-        className="cover__artwork"
+        className="w-full h-full bg-black rounded-md relative z-20 shadow-[0_8px_22px_rgba(0,0,0,0.5)] transition-transform duration-[180ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] will-change-transform transform-style-3d"
         aria-hidden="true"
-        style={sleeveImage ? { backgroundImage: `url(${sleeveImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+        style={{
+          transform: 'translate(var(--parallax-sleeve-x, 0px), var(--parallax-sleeve-y, 0px)) rotateX(var(--parallax-tilt-x, 0deg)) rotateY(var(--parallax-tilt-y, 0deg))',
+          backgroundImage: sleeveImage ? `url(${sleeveImage})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
       >
-        {/* Hide the floating logo for album covers (they have a `tracks` array) */}
         {!(track && Array.isArray(track.tracks) && track.tracks.length > 0) && (
-          <img src="/logo/logoSVG.svg" className="cover__logo" alt="" aria-hidden="true" />
+          <img src="/logo/logoSVG.svg" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2/5 h-auto pointer-events-none block" alt="" aria-hidden="true" />
         )}
       </div>
 
       <div
-        className={["vinyl", out ? 'vinyl--visible' : ''].join(' ')}
+        className="absolute z-[5] left-1/2 top-1/2 transition-transform duration-[320ms] ease-[cubic-bezier(0.2,0.9,0.2,1)] will-change-transform"
         aria-hidden={!out}
         onClick={(e) => {
-          // clicking the vinyl itself should not trigger cover click
           e.stopPropagation()
           try {
-            // Only allow putting the vinyl back if it's not spinning. If it's spinning, ignore click.
-                if (spinning) {
-                  return
-                }
-                // retract the sleeve and reset playback (stop) for the current track
-                setOut(false)
-                try {
-                  const audio = document.querySelector('.audio-player audio')
-                  if (audio && matchesAudioSrc(audio)) {
-                    try { audio.pause() } catch (e) {}
-                    try { audio.currentTime = 0 } catch (e) {}
-                  }
-                } catch (e) {}
-                // update global state and notify other covers
-                    try {
-                      const current = trackRef.current
-                      const myId = current?._id || current?.id
-                      if (myId) stopVinyl(String(myId))
-                    } catch (err) {}
+            if (spinning) return
+            setOut(false)
+            try {
+              const audio = document.querySelector('.audio-player audio')
+              if (audio && matchesAudioSrc(audio)) {
+                try { audio.pause() } catch (e) {}
+                try { audio.currentTime = 0 } catch (e) {}
+              }
+            } catch (e) {}
+            try {
+              const current = trackRef.current
+              const myId = current?._id || current?.id
+              if (myId) stopVinyl(String(myId))
+            } catch (err) {}
           } catch (e) {
             setOut(false)
           }
         }}
+        style={{
+           width: 'var(--vinyl-width)',
+           height: 'var(--vinyl-width)',
+           // If out, protrude. If not, hidden behind.
+           transform: out
+             ? 'translate(calc(-50% + var(--vinyl-protrude) + var(--parallax-vinyl-x, 0px)), calc(-50% + var(--parallax-vinyl-y, 0px))) rotateX(var(--parallax-tilt-x, 0deg)) rotateY(var(--parallax-tilt-y, 0deg))'
+             : 'translate(calc(-50% + var(--parallax-vinyl-x, 0px)), calc(-50% + var(--parallax-vinyl-y, 0px))) rotateX(var(--parallax-tilt-x, 0deg)) rotateY(var(--parallax-tilt-y, 0deg))'
+        }}
       >
-        <div className="vinyl__shadow" />
+        <div className="hidden absolute left-0 top-0 w-full h-full rounded-full" />
         <div
-          className={["vinyl__circle", spinning ? 'vinyl__circle--spin' : ''].join(' ')}
-          style={{ backgroundImage: `url(${vinylImg})` }}
+          className="absolute left-0 top-0 w-full h-full rounded-full bg-cover bg-center bg-no-repeat z-[4] bg-transparent origin-center shadow-none border-none animate-cover-rotate"
+          style={{ 
+            backgroundImage: `url(${vinylImg})`,
+            animationPlayState: spinning ? 'running' : 'paused'
+          }}
         />
       </div>
     </div>

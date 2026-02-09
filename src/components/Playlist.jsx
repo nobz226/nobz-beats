@@ -129,39 +129,49 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
   }, [])
 
   return (
-    <aside ref={ref} className="playlist" aria-label="Playlist">
+    <aside 
+      ref={ref} 
+      className="playlist fixed top-[4.6875rem] w-[22.5rem] h-[34.375rem] max-h-[calc(100vh-7.5rem)] overflow-y-auto z-[1002] text-white p-3 rounded-lg opacity-0 left-auto bg-white/[0.03] translate-x-5 animate-playlist-slide font-cutive [&::-webkit-scrollbar]:w-2.5 [&::-webkit-scrollbar-thumb]:rounded-lg [&::-webkit-scrollbar-thumb]:bg-white/[0.06]"
+      style={{ animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s + var(--title-fade) + var(--player-gap) + var(--playlist-gap))' }}
+      aria-label="Playlist"
+    >
       {currentTrack && (
-        <div className="currently-playing" aria-label="Currently playing">
-          <img className="currently-playing-art" src={currentTrack.artwork || '/artwork/default.png'} alt="Artwork" />
-          <div className="currently-playing-meta">
-            <div className="currently-playing-title">{currentTrack.title}</div>
-            <div className="currently-playing-sub muted">{currentTrack.album ? `${currentTrack.album} — ${currentTrack.title}` : currentTrack.artist}</div>
+        <div className="flex gap-3 items-center py-2 pb-3 mb-2 border-b border-white/[0.03]" aria-label="Currently playing">
+          <img className="w-[3.25rem] h-[3.25rem] object-cover rounded-md" src={currentTrack.artwork || '/artwork/default.png'} alt="Artwork" />
+          <div className="flex flex-col">
+            <div className="font-bold text-[0.95rem]">{currentTrack.title}</div>
+            <div className="text-[0.8rem] opacity-90">{currentTrack.album ? `${currentTrack.album} — ${currentTrack.title}` : currentTrack.artist}</div>
           </div>
         </div>
       )}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 className="cal-sans-title" style={{ fontSize: '18px', margin: 0 }}>Playlist</h3>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn" aria-label="Play playlist" onClick={() => onPlayPlaylist && onPlayPlaylist()}>▶</button>
-          <button className="btn" aria-label="Shuffle playlist" onClick={() => onShuffle && onShuffle()}>🔀</button>
-          <button className="btn" aria-label="Clear playlist" onClick={() => onClear && onClear()}>✖</button>
+      <div className="flex justify-between items-center">
+        <h3 className="font-cal-sans font-bold text-lg m-0">Playlist</h3>
+        <div className="flex gap-2">
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Play playlist" onClick={() => onPlayPlaylist && onPlayPlaylist()}>▶</button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Shuffle playlist" onClick={() => onShuffle && onShuffle()}>🔀</button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Clear playlist" onClick={() => onClear && onClear()}>✖</button>
         </div>
       </div>
 
-      <ul className="playlist-list" style={{ marginTop: 12 }}>
+      <ul className="list-none m-0 p-0 flex flex-col gap-2 mt-3">
         {tracks.map(t => (
-          <li key={t.id} className={`playlist-item ${currentTrackId === t.id ? 'playing' : ''}`} tabIndex={0} role="button">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ flex: 1 }} onClick={() => onSelect && onSelect(t)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect && onSelect(t) } }}>
-                <div className="playlist-title">{t.title}</div>
-                <div className="playlist-meta cutive-mono-regular">{t.artist} · {durations[t.id] || t.duration || '0:00'}</div>
+          <li 
+            key={t.id} 
+            className={`py-1.5 px-2 rounded-md cursor-pointer hover:bg-white/[0.04] focus:outline-none focus:bg-white/[0.04] ${currentTrackId === t.id ? 'bg-gradient-to-r from-white/[0.03] to-white/[0.01] border-l-[3px] border-[#c8c8c8]' : ''}`} 
+            tabIndex={0} 
+            role="button"
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex-1" onClick={() => onSelect && onSelect(t)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect && onSelect(t) } }}>
+                <div className="font-cal-sans font-semibold text-sm">{t.title}</div>
+                <div className="font-cutive font-normal text-white/90">{t.artist} · {durations[t.id] || t.duration || '0:00'}</div>
               </div>
-              <div style={{ display: 'flex', gap: 8, marginLeft: 8 }}>
+              <div className="flex gap-2 ml-2">
                 {(() => {
                   const isThisPlaying = currentTrackId === t.id && !audioState.paused
                   return (
                     <button
-                      className="btn"
+                      className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]"
                       aria-label={isThisPlaying ? 'Pause' : 'Play'}
                       onClick={(e) => {
                         e.stopPropagation()

@@ -29,21 +29,33 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
   }
 
   return (
-    <div className={`two-up-carousel ${className}`.trim()}>
-      <button className="carousel-arrow carousel-arrow--left" aria-label="Previous" onClick={prev}>◀</button>
-      <div className="carousel-track">
+    <div className={`relative flex items-center justify-center ${className}`.trim()}>
+      <button 
+        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white -left-20" 
+        aria-label="Previous" 
+        onClick={prev}
+      >
+        ◀
+      </button>
+      <div className="flex gap-24 items-start px-14">
         {windowItems().map(({ child, srcIndex }) => {
           const stableKey = child && child.key != null
             ? child.key
             : (child?.props?.track?._id || child?.props?.track?.id || String(srcIndex))
           return (
-            <div key={stableKey} className="carousel-slot">
+            <div key={stableKey} className="inline-flex w-[22.5rem] flex-[0_0_22.5rem]">
               {child}
             </div>
           )
         })}
       </div>
-      <button className="carousel-arrow carousel-arrow--right" aria-label="Next" onClick={next}>▶</button>
+      <button 
+        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white -right-20" 
+        aria-label="Next" 
+        onClick={next}
+      >
+        ▶
+      </button>
     </div>
   )
 }

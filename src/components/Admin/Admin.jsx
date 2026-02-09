@@ -42,40 +42,51 @@ export default function Admin() {
 
   if (!authed) {
     return (
-      <main className="admin-page">
-        <h2>Admin Login</h2>
-        <form onSubmit={login} className="admin-form">
-          <label>
-            Username
-            <input value={username} onChange={e => setUsername(e.target.value)} required />
+      <main className="p-8 max-w-md mx-auto mt-20 bg-white/[0.03] rounded-lg">
+        <h2 className="text-2xl font-bold mb-6 font-cal-sans">Admin Login</h2>
+        <form onSubmit={login}>
+          <label className="block mb-4">
+            <span className="block text-sm font-medium mb-1">Username</span>
+            <input 
+              className="w-full bg-white/[0.05] border border-white/10 rounded px-3 py-2 text-white focus:outline-none focus:border-white/30"
+              value={username} 
+              onChange={e => setUsername(e.target.value)} 
+              required 
+            />
           </label>
-          <label>
-            Password
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          <label className="block mb-6">
+            <span className="block text-sm font-medium mb-1">Password</span>
+            <input 
+              type="password" 
+              className="w-full bg-white/[0.05] border border-white/10 rounded px-3 py-2 text-white focus:outline-none focus:border-white/30"
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              required 
+            />
           </label>
           <div>
-            <button className="btn" type="submit">Sign in</button>
+            <button className="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-4 rounded w-full transition-colors" type="submit">Sign in</button>
           </div>
         </form>
-        <p className="muted">Configure admin credentials via <code>VITE_ADMIN_USER</code> and <code>VITE_ADMIN_PASSWORD</code> (or <code>REACT_APP_ADMIN_USER</code> / <code>REACT_APP_ADMIN_PASSWORD</code> as fallback).</p>
+        <p className="mt-4 text-sm opacity-50 font-cutive">Configure admin credentials via <code>VITE_ADMIN_USER</code> and <code>VITE_ADMIN_PASSWORD</code>.</p>
       </main>
     )
   }
 
   return (
-    <main className="admin-page">
-      <header className="admin-header">
-        <h2>Admin {username ? `— ${username}` : ''}</h2>
-        <div style={{display: 'flex', gap: 8}}>
-          <button className="btn" onClick={() => setTab('tracks')}>Tracks</button>
-          <button className="btn" onClick={() => setTab('albums')}>Albums</button>
-          <button className="btn" onClick={() => setTab('addTrack')}>Add Track</button>
-          <button className="btn" onClick={() => setTab('addAlbum')}>Add Album</button>
-          <button className="btn" onClick={logout}>Logout</button>
+    <main className="p-8 max-w-6xl mx-auto mt-20">
+      <header className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+        <h2 className="text-2xl font-bold font-cal-sans">Admin {username ? `— ${username}` : ''}</h2>
+        <div className="flex gap-2">
+          <button className={`px-3 py-1.5 rounded transition-colors ${tab === 'tracks' ? 'bg-white text-black' : 'bg-white/5 hover:bg-white/10'}`} onClick={() => setTab('tracks')}>Tracks</button>
+          <button className={`px-3 py-1.5 rounded transition-colors ${tab === 'albums' ? 'bg-white text-black' : 'bg-white/5 hover:bg-white/10'}`} onClick={() => setTab('albums')}>Albums</button>
+          <button className={`px-3 py-1.5 rounded transition-colors ${tab === 'addTrack' ? 'bg-white text-black' : 'bg-white/5 hover:bg-white/10'}`} onClick={() => setTab('addTrack')}>Add Track</button>
+          <button className={`px-3 py-1.5 rounded transition-colors ${tab === 'addAlbum' ? 'bg-white text-black' : 'bg-white/5 hover:bg-white/10'}`} onClick={() => setTab('addAlbum')}>Add Album</button>
+          <button className="px-3 py-1.5 rounded bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-colors ml-4" onClick={logout}>Logout</button>
         </div>
       </header>
 
-      <section className="admin-body">
+      <section>
         {tab === 'tracks' && (
           <ErrorBoundary>
             <TracksList />

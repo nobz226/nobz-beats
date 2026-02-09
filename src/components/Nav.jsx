@@ -67,10 +67,21 @@ export default function Nav() {
     return () => { window.removeEventListener('resize', updatePos); mo.disconnect() }
   }, [])
 
+  const navItemClass = "text-white no-underline font-doto text-2xl font-medium py-2 px-3 rounded-md opacity-0 hover:bg-white/[0.08] focus:bg-white/[0.08] focus:outline-none focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+  const navItemStyle = {
+    fontOpticalSizing: 'auto',
+    fontStyle: 'normal',
+    fontVariationSettings: '"ROND" 0',
+    transform: 'translateX(-0.75rem)',
+    animation: 'nav-slide 0.6s cubic-bezier(0.22, 0.8, 0.25, 1) forwards',
+    willChange: 'transform, opacity',
+    transition: 'background-color 0.12s ease, color 0.12s ease, transform 0.45s cubic-bezier(0.22, 0.8, 0.25, 1), opacity 0.45s cubic-bezier(0.22, 0.8, 0.25, 1)'
+  }
+
   return (
-    <nav ref={navRef} className={`site-nav ${open ? 'open' : ''}`} aria-label="Primary navigation">
+    <nav ref={navRef} className="site-nav fixed top-[4.6875rem] right-20 flex gap-4 z-[1002]" aria-label="Primary navigation">
       <button
-        className="nav-toggle"
+        className="hidden relative z-[1102] text-[1.625rem] p-2 cursor-pointer rounded-lg border-none text-white bg-white/[0.03]"
         aria-label={open ? 'Close menu' : 'Open menu'}
         aria-expanded={open}
         onClick={() => setOpen(o => !o)}
@@ -78,14 +89,14 @@ export default function Nav() {
         ☰
       </button>
 
-      <div className={`nav-links ${open ? 'open' : ''}`} onClick={onClick}>
-        <a href="/singles">&gt;Singles</a>
-        <a href="/albums">&gt;Albums</a>
-        <a href="/remixes">&gt;Remixes</a>
-        <a href="/alltracks">&gt;AllTracks</a>
-        <a href="/about">&gt;About</a>
-        <a href="/connect">&gt;Connect</a>
+      <div className="flex gap-4 items-center" onClick={onClick}>
+        <a href="/singles" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.12s)'}}>&gt;Singles</a>
+        <a href="/albums" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.24s)'}}>&gt;Albums</a>
+        <a href="/remixes" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.36s)'}}>&gt;Remixes</a>
+        <a href="/alltracks" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.48s)'}}>&gt;AllTracks</a>
+        <a href="/about" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.6s)'}}>&gt;About</a>
+        <a href="/connect" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'}}>&gt;Connect</a>
       </div>
     </nav>
   )
-}  
+}

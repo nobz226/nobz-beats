@@ -3,7 +3,7 @@ import Cover from './Cover'
 import TwoUpCarousel from './TwoUpCarousel'
 import { playVinyl, pauseVinyl } from '../lib/vinyl'
 
-export function SingleItem({ track, onPlay, onAdd }) {
+export function SingleItem({ track, onPlay, onAdd, className = '' }) {
   const t = track || {
     title: 'Armitage',
     type: 'Single',
@@ -58,15 +58,15 @@ export function SingleItem({ track, onPlay, onAdd }) {
   }
 
   return (
-    <div className="latest-item" aria-label={`Single ${t.title}`}>
-      <Cover track={t} onPlay={onPlay} className="latest-artwork-cover" sleeveImage="/artwork/single.jpg" />
-      <div className="latest-meta cutive-mono-regular">
-        <strong>{t.title}</strong>
-        <div style={{ marginTop: 6 }}>{t.type}</div>
-        <p className="latest-description" style={{ marginTop: 8 }}>{t.description}</p>
-        <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>
-          <button className="btn" aria-label="Add to playlist" onClick={() => onAdd && onAdd(t)}>＋</button>
+    <div className={`flex flex-col gap-3 items-center w-[22.5rem] ${className}`.trim()} aria-label={`Single ${t.title}`}>
+      <Cover track={t} onPlay={onPlay} className="mr-4" sleeveImage="/artwork/single.jpg" />
+      <div className="font-cutive text-center">
+        <strong className="block text-lg font-bold">{t.title}</strong>
+        <div className="mt-1.5">{t.type}</div>
+        <p className="max-w-80 mx-auto mt-2 leading-relaxed text-center text-[0.9375rem] break-words">{t.description}</p>
+        <div className="mt-2 flex gap-2 justify-center">
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Add to playlist" onClick={() => onAdd && onAdd(t)}>＋</button>
         </div>
       </div>
     </div>
@@ -75,9 +75,18 @@ export function SingleItem({ track, onPlay, onAdd }) {
 
 export default function Singles({ tracks = [], onPlay, onAdd }) {
   return (
-    <section className="latest-section" aria-label="Singles">
-      <h2 className="cal-sans-title">Singles</h2>
-      <TwoUpCarousel className="latest-grid" >
+    <section 
+      className="latest-section fixed z-[1000] text-white opacity-0 translate-y-2 animate-section-fade"
+      style={{
+        left: 'calc(var(--logo-size) + var(--logo-gap) + 1.125rem)',
+        top: '14.375rem',
+        maxWidth: 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
+        animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'
+      }}
+      aria-label="Singles"
+    >
+      <h2 className="font-cal-sans font-bold text-[1.75rem] m-0 mb-2">Singles</h2>
+      <TwoUpCarousel className="grid gap-24 items-start justify-center mt-3 grid-cols-[repeat(2,22.5rem)]">
         {tracks.map(t => <SingleItem key={t.id} track={t} onPlay={onPlay} onAdd={onAdd} />)}
       </TwoUpCarousel>
     </section>

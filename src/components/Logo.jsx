@@ -4,11 +4,12 @@ import React, { useEffect, useRef } from 'react'
 class GlitchLogo {
   constructor(container) {
     this.container = container
-    this.r = container.querySelector('.logo-r')
-    this.g = container.querySelector('.logo-g')
-    this.b = container.querySelector('.logo-b')
-    this.slices = container.querySelector('.glitch-slices')
-    this.baseImg = container.querySelector('.logo-base')
+    const imgs = container.querySelectorAll('img')
+    this.baseImg = imgs[0]
+    this.r = imgs[1]
+    this.g = imgs[2]
+    this.b = imgs[3]
+    this.slices = container.querySelector('div[aria-hidden="true"]')
     this._mounted = false
 
     this._onResize = this._onResize.bind(this)
@@ -72,9 +73,10 @@ class GlitchLogo {
         const y = Math.floor(this._rand(0, Math.max(0, this.rect.height - h - 1)))
 
         const slice = document.createElement('div')
-        slice.className = 'glitch-slice'
+        slice.className = 'absolute left-0 w-full overflow-hidden'
         slice.style.top = y + 'px'
         slice.style.height = h + 'px'
+        slice.style.transition = 'transform 0.36s cubic-bezier(0.22, 0.8, 0.25, 1), opacity 0.28s ease'
 
         const img = document.createElement('img')
         img.src = this.baseImg.src
@@ -154,14 +156,27 @@ export default function Logo() {
   const onKeyDown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateHome() } }
 
   return (
-    <div className="logo-container" aria-label="Site logo" role="link" tabIndex={0} onClick={navigateHome} onKeyDown={onKeyDown}>
-      <div ref={rootRef} className="logo-glitch" role="img" aria-label="Site logo">
-        <img className="logo-base" src="/logo/logoSVG.svg" alt="Site logo" />
-        <img className="logo-r" src="/logo/logoSVG.svg" aria-hidden="true" />
-        <img className="logo-g" src="/logo/logoSVG.svg" aria-hidden="true" />
-        <img className="logo-b" src="/logo/logoSVG.svg" aria-hidden="true" />
-        <div className="glitch-slices" aria-hidden="true"></div>
+    <div 
+      className="logo-container fixed top-0 left-0 flex items-center justify-center z-[1000] overflow-hidden bg-transparent pointer-events-auto cursor-pointer focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2 focus-visible:rounded-md" 
+      style={{ width: 'var(--logo-size)', height: 'var(--logo-size)' }}
+      aria-label="Site logo" 
+      role="link" 
+      tabIndex={0} 
+      onClick={navigateHome} 
+      onKeyDown={onKeyDown}
+    >
+      <div 
+        ref={rootRef} 
+        className="absolute inset-0 w-full h-full pointer-events-none overflow-visible opacity-0 scale-96 origin-center animate-logo-fade" 
+        role="img" 
+        aria-label="Site logo"
+      >
+        <img className="absolute top-0 left-0 w-full h-full object-contain block z-[1]" src="/logo/logoSVG.svg" alt="Site logo" style={{ transformOrigin: 'center center', transition: 'transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.18s ease' }} />
+        <img className="absolute top-0 left-0 w-full h-full object-contain block z-[2]" src="/logo/logoSVG.svg" aria-hidden="true" style={{ filter: 'url(#redify)', mixBlendMode: 'screen', transformOrigin: 'center center', transition: 'transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.18s ease' }} />
+        <img className="absolute top-0 left-0 w-full h-full object-contain block z-[3]" src="/logo/logoSVG.svg" aria-hidden="true" style={{ filter: 'url(#greenify)', mixBlendMode: 'screen', transformOrigin: 'center center', transition: 'transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.18s ease' }} />
+        <img className="absolute top-0 left-0 w-full h-full object-contain block z-[4]" src="/logo/logoSVG.svg" aria-hidden="true" style={{ filter: 'url(#blueify)', mixBlendMode: 'screen', transformOrigin: 'center center', transition: 'transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.18s ease' }} />
+        <div className="absolute inset-0 z-[6] pointer-events-none" aria-hidden="true"></div>
       </div>
     </div>
   )
-} 
+}

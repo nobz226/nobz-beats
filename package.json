@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check:uploads": "node scripts/check-uploads.js"
+    "check:uploads": "echo \"scripts/check-uploads.js not found; add scripts/check-uploads.js or remove this script\""
   },
   "dependencies": {
     "convex": "^1.31.7",

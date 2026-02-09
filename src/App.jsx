@@ -105,7 +105,7 @@ export default function App() {
     id: latestTrackRaw._id || latestTrackRaw.id,
     title: latestTrackRaw.title,
     artist: latestTrackRaw.artist || 'Nobz',
-    artwork: normalizeAsset(latestTrackRaw.artwork) || '/artworkgit p/default.png',
+    artwork: normalizeAsset(latestTrackRaw.artwork) || '/artwork/default.png',
     src: latestTrackRaw.src,
     duration: latestTrackRaw.duration || '0:00',
     description: latestTrackRaw.description,

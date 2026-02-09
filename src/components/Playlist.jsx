@@ -178,7 +178,7 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
                             audio.pause()
                             try {
                               setVinylState(String(t.id || t._id), { spinning: false })
-                              if (t.albumId) setVinylState(String(t.albumId), { out: false, spinning: false })
+                              if (t.albumId) setVinylState(String(t.albumId), { spinning: false })
                             } catch (e) {}
                           } else {
                             audio.play().catch(() => {})

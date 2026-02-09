@@ -61,7 +61,7 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
                           audio.pause()
                           try {
                             setVinylState(String(it.id || it._id), { spinning: false })
-                            if (it.albumId) setVinylState(String(it.albumId), { out: false, spinning: false })
+                            if (it.albumId) setVinylState(String(it.albumId), { spinning: false })
                           } catch (e) {}
                         } else {
                           audio.play().catch(() => {})

@@ -1,5 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
+/**
+ * Fancier Carousel for Desktop
+ * - Smooth track sliding animation
+ * - Glassmorphic navigation arrows
+ * - Progress dots indicator
+ * - Proper arrow positioning at the edges of the 2-item view
+ */
 export default function TwoUpCarousel({ children = [], step = 2, className = '' }) {
   const items = React.Children.toArray(children)
   const len = items.length
@@ -7,55 +14,85 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
 
   if (len === 0) return null
 
-  const clampIndex = (i) => {
-    // normalize to 0..len-1
-    return ((i % len) + len) % len
-  }
+  const handlePrev = () => setIndex(i => Math.max(0, i - step))
+  const handleNext = () => setIndex(i => Math.min(len - step, i + step))
 
-  const prev = () => setIndex(i => clampIndex(i - step))
-  const next = () => setIndex(i => clampIndex(i + step))
-
-  // build a two-item window, wrapping when needed
-  // return objects with the original child and a stable index so we can
-  // derive a stable key (avoid remounting when carousel slides)
-  const windowItems = () => {
-    if (len <= step) return items.map((c, idx) => ({ child: c, srcIndex: idx }))
-    const out = []
-    for (let k = 0; k < step; k++) {
-      const srcIdx = clampIndex(index + k)
-      out.push({ child: items[srcIdx], srcIndex: srcIdx })
-    }
-    return out
-  }
+  // The user wants a 2-up view on desktop.
+  // Each item is 22.5rem wide (360px), and we use a gap of 6rem (md:gap-24).
+  // Total visible width = (22.5 * 2) + 6 = 51rem.
+  const itemWidthRem = 22.5
+  const gapWidthRem = 6
+  const carouselWidth = `${(itemWidthRem * 2) + gapWidthRem}rem`
 
   return (
-    <div className={`relative flex items-center justify-center ${className}`.trim()}>
-      <button 
-        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white left-0" 
-        aria-label="Previous" 
-        onClick={prev}
-      >
-        ◀
-      </button>
-      <div className="flex gap-24 items-start px-14">
-        {windowItems().map(({ child, srcIndex }) => {
-          const stableKey = child && child.key != null
-            ? child.key
-            : (child?.props?.track?._id || child?.props?.track?.id || String(srcIndex))
-          return (
-            <div key={stableKey} className="inline-flex w-[22.5rem] flex-[0_0_22.5rem]">
+    <div 
+      className="carousel-container relative mx-auto group pb-12" 
+      style={{ width: carouselWidth }}
+    >
+      {/* Viewport for the sliding track */}
+      <div className="carousel-viewport w-full overflow-hidden pt-4">
+        <div 
+          className="carousel-track flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform"
+          style={{ 
+            gap: `${gapWidthRem}rem`,
+            transform: `translateX(calc(-${index} * (${itemWidthRem}rem + ${gapWidthRem}rem)))`
+          }}
+        >
+          {items.map((child, i) => (
+            <div 
+              key={i} 
+              className={`carousel-item flex-shrink-0 w-[22.5rem] transition-opacity duration-700 ${
+                i >= index && i < index + step ? 'opacity-100' : 'opacity-20 scale-95'
+              }`}
+            >
               {child}
             </div>
-          )
-        })}
+          ))}
+        </div>
       </div>
-      <button 
-        className="absolute top-1/2 -translate-y-1/2 bg-white/2 border-none text-white w-12 h-12 inline-grid place-items-center cursor-pointer rounded-full text-lg z-40 focus:outline-2 focus:outline-white right-0" 
-        aria-label="Next" 
-        onClick={next}
-      >
-        ▶
-      </button>
+
+      {/* Navigation Arrows - Styled with Glassmorphism */}
+      {index > 0 && (
+        <button
+          onClick={handlePrev}
+          className="absolute left-[-3rem] top-[35%] -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white backdrop-blur-xl z-50 transition-all hover:bg-white/10 hover:border-white/20 hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer"
+          aria-label="Previous"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+      )}
+
+      {index + step < len && (
+        <button
+          onClick={handleNext}
+          className="absolute right-[-3rem] top-[35%] -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white backdrop-blur-xl z-50 transition-all hover:bg-white/10 hover:border-white/20 hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer"
+          aria-label="Next"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      )}
+
+      {/* Progress Dots */}
+      {len > step && (
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-3">
+          {Array.from({ length: Math.ceil(len / step) }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i * step)}
+              className={`h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer ${
+                Math.floor(index / step) === i 
+                  ? 'w-10 bg-white/80' 
+                  : 'w-3 bg-white/20 hover:bg-white/40'
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

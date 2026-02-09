@@ -78,11 +78,14 @@ export default function App() {
 
   const allTracks = dbTracks.map(t => {
     const album = dbAlbums.find(a => (a._id || a.id) === t.albumId)
+    // Prefer the album artwork for tracks that belong to an album so updates
+    // to the album's artwork are reflected everywhere (AllTracks view, etc.).
+    const artwork = album ? (normalizeAsset(album.artwork) || '/artwork/default.png') : (normalizeAsset(t.artwork) || '/artwork/default.png')
     return {
       id: t._id || t.id,
       title: t.title,
       artist: t.artist || 'Nobz',
-      artwork: normalizeAsset(t.artwork) || (album ? album.artwork : '/artwork/default.png'),
+      artwork,
       src: t.src,
       duration: t.duration || '0:00',
       description: t.description,

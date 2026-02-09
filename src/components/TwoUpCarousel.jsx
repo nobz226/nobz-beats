@@ -16,14 +16,21 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
   const containerRef = useRef(null)
   const trackRef = useRef(null)
   const isDragging = useRef(false)
+  const dragMoved = useRef(false)
+  const [suppressClicks, setSuppressClicks] = useState(false)
   const startX = useRef(0)
   const currentOffset = useRef(0)
   const raf = useRef(null)
   const slideWidth = useRef(0)
   const lastWheelAt = useRef(0)
 
-  const handlePrev = () => setIndex(i => Math.max(0, i - step))
-  const handleNext = () => setIndex(i => Math.min(len - step, i + step))
+  const clearSuppress = (ms = 300) => {
+    setSuppressClicks(true)
+    setTimeout(() => setSuppressClicks(false), ms)
+  }
+
+  const handlePrev = () => { clearSuppress(); setIndex(i => Math.max(0, i - step)) }
+  const handleNext = () => { clearSuppress(); setIndex(i => Math.min(len - step, i + step)) }
 
   // compute slide width (px) based on first item and gap
   useEffect(() => {
@@ -73,12 +80,19 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
       <div
         ref={containerRef}
         className="carousel-viewport w-full overflow-hidden lg:overflow-visible pt-4"
+        onClickCapture={(e) => {
+          // Prevent clicks from firing on children if a drag occurred or clicks are suppressed
+          if (dragMoved.current || suppressClicks) {
+            try { e.preventDefault(); e.stopPropagation(); if (e.nativeEvent && e.nativeEvent.stopImmediatePropagation) e.nativeEvent.stopImmediatePropagation() } catch (err) {}
+          }
+        }}
         onPointerDown={(e) => {
           // Ignore pointerdown on native interactive controls (buttons, links, inputs)
           // but allow elements that merely use role="button" (e.g. Cover) so dragging still works.
           const interactive = e.target && (e.target.closest ? e.target.closest('button, a, input, textarea, select, label, summary') : null)
           if (interactive) return
           isDragging.current = true
+          dragMoved.current = false
           startX.current = e.clientX
         }}
         style={{ touchAction: 'pan-y' }}
@@ -86,6 +100,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
           if (!isDragging.current) return
           const dx = e.clientX - startX.current
           currentOffset.current = dx
+          if (Math.abs(dx) > 5) dragMoved.current = true
           if (raf.current) cancelAnimationFrame(raf.current)
           raf.current = requestAnimationFrame(() => updateTransform(currentOffset.current))
         }}
@@ -103,17 +118,27 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
           }
           currentOffset.current = 0
           if (raf.current) { cancelAnimationFrame(raf.current); raf.current = null }
+          if (dragMoved.current) {
+            // briefly suppress clicks after a drag so accidental clicks don't fire
+            setSuppressClicks(true)
+            setTimeout(() => setSuppressClicks(false), 300)
+          }
+          dragMoved.current = false
         }}
         onPointerCancel={(e) => {
           isDragging.current = false
           currentOffset.current = 0
           updateTransform(0)
           try { /* no-op: avoid releasing pointer capture so child clicks fire */ } catch (er) {}
+          dragMoved.current = false
         }}
         onWheel={(e) => {
           const now = Date.now()
           if (now - lastWheelAt.current < 200) return
           lastWheelAt.current = now
+          // suppress clicks briefly after wheel navigation
+          setSuppressClicks(true)
+          setTimeout(() => setSuppressClicks(false), 300)
           if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
             if (e.deltaY > 0) handleNext()
             else handlePrev()
@@ -134,6 +159,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
               className={`carousel-item flex-shrink-0 w-[22.5rem] transition-opacity duration-700 ${
                  i >= index && i < index + step ? 'opacity-100' : 'opacity-20 scale-95'
                }`}
+              style={{ pointerEvents: suppressClicks ? 'none' : undefined }}
             >
               {child}
             </div>

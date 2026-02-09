@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Cover from './Cover'
 import TwoUpCarousel from './TwoUpCarousel'
+import { setVinylState } from '../lib/vinyl'
 
 export function AlbumItem({ track, onPlayAlbum, onAddAlbum }) {
   const a = track || {
@@ -59,8 +60,16 @@ export function AlbumItem({ track, onPlayAlbum, onAddAlbum }) {
     if (audio && isPlaying) {
       audio.pause()
       setIsPlaying(false)
+      try { setVinylState(String(a.id || a._id), { spinning: false }) } catch (e) {}
       return
     }
+    // Ensure album vinyl is visible and spinning immediately when play is requested
+    try {
+      if (Array.isArray(a.tracks) && a.tracks.length > 0) {
+        a.tracks.forEach(t => { try { setVinylState(String(t.id || t._id), { out: true, spinning: true }) } catch (e) {} })
+      }
+      try { setVinylState(String(a.id || a._id), { out: true, spinning: true }) } catch (e) {}
+    } catch (e) {}
     if (onPlayAlbum) onPlayAlbum(a)
     if (audio) setTimeout(() => audio.play().catch(() => {}), 50)
   }

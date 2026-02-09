@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Cover from './Cover'
 import TwoUpCarousel from './TwoUpCarousel'
+import { setVinylState } from '../lib/vinyl'
 
 export function SingleItem({ track, onPlay, onAdd }) {
   const t = track || {
@@ -42,10 +43,16 @@ export function SingleItem({ track, onPlay, onAdd }) {
   const handleTogglePlay = async () => {
     const audio = document.querySelector('.audio-player audio')
     if (audio && matchesAudioSrc(audio)) {
-      if (!audio.paused) audio.pause()
-      else await audio.play().catch(() => {})
+      if (!audio.paused) {
+        audio.pause()
+        try { setVinylState(String(t.id || t._id), { spinning: false }) } catch (e) {}
+      } else {
+        await audio.play().catch(() => {})
+        try { setVinylState(String(t.id || t._id), { out: true, spinning: true }) } catch (e) {}
+      }
       return
     }
+    try { setVinylState(String(t.id || t._id), { out: true, spinning: true }) } catch (e) {}
     if (onPlay) onPlay(t)
     if (audio) setTimeout(() => audio.play().catch(() => {}), 50)
   }

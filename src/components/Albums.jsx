@@ -14,16 +14,18 @@ export function AlbumItem({ track, onPlayAlbum, onAddAlbum, onPlayTrack, onAddTr
 
   return (
     <div className="latest-item album-with-tracks" aria-label={`Album ${a.title}`}>
-      <div className="album-left">
+      <div
+        className="album-left"
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
+        onClick={() => setExpanded(prev => !prev)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(prev => !prev) } }}
+      >
         <img
           className="latest-artwork"
           src={a.artwork}
           alt={`${a.title} artwork`}
-          role="button"
-          tabIndex={0}
-          aria-expanded={expanded}
-          onClick={() => setExpanded(prev => !prev)}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(prev => !prev) } }}
         />
         <div className="latest-meta cutive-mono-regular">
           <strong>{a.title}</strong>

@@ -402,7 +402,7 @@ body {
 
   .main-content { padding-top: 0.5rem; padding-bottom: calc(4.5rem + 1.5rem); }
 
-  .latest-grid { flex-direction: column; gap: 1.125rem; align-items: stretch }
+  .latest-grid { grid-template-columns: 1fr; gap: 1.125rem; align-items: stretch }
   .latest-artwork { width: 100%; max-width: 20rem; height: auto }
   .album-left { width: 100% }
   .album-tracks.expanded { max-height: 22.5rem; overflow: auto }
@@ -701,10 +701,11 @@ body {
   font-family: "Cutive Mono", monospace;
 }
 
-/* Layout: show single and album side-by-side and center them */
+/* Layout: show items in a two-column grid and center them */
 .latest-grid {
-  display: flex;
-  gap: 6rem; /* increased spacing between single and album */
+  display: grid;
+  grid-template-columns: repeat(2, 22.5rem);
+  gap: 6rem; /* spacing between items */
   align-items: flex-start;
   justify-content: center; /* center the whole block */
   margin-top: 0.75rem;
@@ -719,6 +720,17 @@ body {
 }
 
 .latest-item.album-with-tracks { width: 100%; max-width: none; align-items: stretch; }
+
+/* Featured/latest view: single + album layout (single fixed, album flexible) */
+.latest-grid.latest--featured {
+  grid-template-columns: 22.5rem 1fr;
+  justify-content: center;
+}
+
+/* ensure the album entry sits in the second column for the featured layout */
+.latest-grid.latest--featured > .latest-item.album-with-tracks {
+  grid-column: 2;
+}
 /* Albums with tracklist: show tracks on the right */
 .album-with-tracks {
   flex-direction: row;
@@ -772,7 +784,7 @@ body {
 }
 
 @media (max-width: 45rem) {
-  .latest-grid { flex-direction: column; }
+  .latest-grid { grid-template-columns: 1fr; }
   .latest-item { width: 100%; }
   .latest-artwork { width: 15rem; height: 15rem; max-width: 15rem; }
   .latest-description { max-width: 16.25rem }

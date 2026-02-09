@@ -7,7 +7,7 @@ export default function Latest({ single, album, onPlay, onAdd, onPlayAlbum, onAd
     <section className="latest-section" aria-label="Latest release">
       <h2 className="cal-sans-title">Latest</h2>
 
-      <div className="latest-grid">
+      <div className="latest-grid latest--featured">
         <SingleItem track={single} onPlay={onPlay} onAdd={onAdd} />
         <AlbumItem
           track={album}

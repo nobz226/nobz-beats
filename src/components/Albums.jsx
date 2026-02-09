@@ -72,7 +72,7 @@ export function AlbumItem({ track, onPlayAlbum, onAddAlbum, className = '' }) {
   }
 
   return (
-    <div className={`flex flex-col gap-3 items-center w-full max-w-[22.5rem] ${className}`.trim()} aria-label={`Album ${a.title}`}>
+    <div className={`flex flex-col gap-3 items-center w-full max-w-[20rem] ${className}`.trim()} aria-label={`Album ${a.title}`}>
       <Cover track={a} onPlay={() => onPlayAlbum && onPlayAlbum(a)} className="mr-4" sleeveImage={a.artwork} />
       <div className="font-cutive text-center">
         <strong className="block text-lg font-bold">{a.title}</strong>
@@ -101,11 +101,11 @@ export default function Albums({ tracks = [], onPlayAlbum, onAddAlbum, onPlayTra
 
   return (
     <section 
-      className={`latest-section fixed z-[1000] text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
+      className={`latest-section fixed z-[1004] text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
       style={{
         left: isMobile ? '0' : 'var(--main-left)',
-        top: 'var(--main-top)',
-        bottom: isMobile ? '8rem' : 'auto',
+        top: isMobile ? 'var(--main-top)' : 'calc(var(--main-top) - 1rem)',
+        bottom: isMobile ? '8rem' : '6rem',
         width: isMobile ? '100%' : 'auto',
         maxWidth: isMobile ? 'none' : 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
         animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'
@@ -115,7 +115,7 @@ export default function Albums({ tracks = [], onPlayAlbum, onAddAlbum, onPlayTra
       <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? 'px-4' : ''}`}>Albums</h2>
       
       {!isMobile ? (
-        <TwoUpCarousel className="grid gap-8 md:gap-24 items-start justify-center mt-3 grid-cols-1 lg:grid-cols-[repeat(2,22.5rem)]">
+        <TwoUpCarousel className="grid gap-8 md:gap-24 items-start justify-center mt-3 grid-cols-1 lg:grid-cols-[repeat(2,20rem)]">
           {tracks.map(t => (
             <AlbumItem
               key={t.id}
@@ -140,6 +140,9 @@ export default function Albums({ tracks = [], onPlayAlbum, onAddAlbum, onPlayTra
             />
           ))}
         </div>
+      )}
+      {isMobile && (
+        {/* helper text removed */}
       )}
     </section>
   )

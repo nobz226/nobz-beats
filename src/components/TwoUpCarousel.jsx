@@ -65,15 +65,14 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
   }, [])
 
   // The user wants a 2-up view on desktop.
-  // Each item is 22.5rem wide (360px), and we use a gap of 6rem (md:gap-24).
-  // Total visible width = (22.5 * 2) + 6 = 51rem.
-  const itemWidthRem = 22.5
-  const gapWidthRem = 6
+  // Each item is 20rem wide. Increase gap for more space between covers.
+  const itemWidthRem = 20
+  const gapWidthRem = 8
   const carouselWidth = `${(itemWidthRem * 2) + gapWidthRem}rem`
 
   return (
     <div 
-      className="carousel-container relative mx-auto group pb-12" 
+      className="carousel-container relative mx-auto group pb-0" 
       style={{ width: carouselWidth }}
     >
       {/* Viewport for the sliding track */}
@@ -156,7 +155,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
           {items.map((child, i) => (
             <div 
               key={i} 
-              className={`carousel-item flex-shrink-0 w-[22.5rem] transition-opacity duration-700 ${
+              className={`carousel-item flex-shrink-0 w-[20rem] transition-opacity duration-700 ${
                  i >= index && i < index + step ? 'opacity-100' : 'opacity-20 scale-95'
                }`}
               style={{ pointerEvents: suppressClicks ? 'none' : undefined }}
@@ -170,22 +169,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
       {/* Navigation arrows removed */}
 
       {/* Progress Dots */}
-      {len > step && (
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-3">
-          {Array.from({ length: Math.ceil(len / step) }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i * step)}
-              className={`h-1.5 rounded-full transition-all duration-300 border-none cursor-pointer ${
-                Math.floor(index / step) === i 
-                  ? 'w-10 bg-white/80' 
-                  : 'w-3 bg-white/20 hover:bg-white/40'
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
+      {/* helper text and progress dots removed per request */}
     </div>
   )
 }

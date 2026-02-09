@@ -241,8 +241,9 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
         onClick={(e) => {
           e.stopPropagation()
           try {
-            if (spinning) return
+            // Always stop playback when vinyl is clicked (even if spinning)
             setOut(false)
+            setSpinning(false)
             try {
               const audio = document.querySelector('.audio-player audio')
               if (audio && matchesAudioSrc(audio)) {
@@ -257,6 +258,7 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
             } catch (err) {}
           } catch (e) {
             setOut(false)
+            setSpinning(false)
           }
         }}
         style={{

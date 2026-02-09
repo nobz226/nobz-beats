@@ -38,7 +38,7 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
       className={`latest-section fixed z-[1000] text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
       style={{
         left: isMobile ? '0' : 'var(--main-left)',
-        top: 'var(--main-top)',
+        top: isMobile ? 'var(--main-top)' : 'calc(var(--main-top) - 1rem)',
         bottom: isMobile ? '8rem' : 'auto',
         width: isMobile ? '100%' : 'auto',
         maxWidth: isMobile ? 'none' : 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',

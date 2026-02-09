@@ -154,6 +154,35 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
+  // Keep the main content (latest section) max-width aligned with the
+  // right border of the site nav so the AllTracks list spans up to the
+  // nav items. We measure DOM positions and set a CSS variable
+  // `--latest-maxwidth` used in CSS.
+  useEffect(() => {
+    const update = () => {
+      try {
+        const latest = document.querySelector('.latest-section')
+        const nav = document.querySelector('.site-nav')
+        if (!latest || !nav) return
+        const latestRect = latest.getBoundingClientRect()
+        const navRect = nav.getBoundingClientRect()
+        // compute available width between latest left and nav right, subtract small gutter
+        const gutter = 16
+        const max = Math.max(200, Math.round(navRect.right - latestRect.left - gutter))
+        document.documentElement.style.setProperty('--latest-maxwidth', `${max}px`)
+      } catch (e) {
+        // ignore measurement errors
+      }
+    }
+
+    update()
+    window.addEventListener('resize', update)
+    const mo = new MutationObserver(update)
+    const nav = document.querySelector('.site-nav')
+    if (nav) mo.observe(nav, { childList: true, subtree: true })
+    return () => { window.removeEventListener('resize', update); mo.disconnect() }
+  }, [dbTracks, dbAlbums])
+
   // player controls and playlist management
   const playTrack = (t) => { setCurrentTrack(t) }
 

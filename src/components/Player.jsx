@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
+import { setVinylState } from '../lib/vinyl'
 
 // Simple audio player — replace the sample track with real sources as needed
 export default function Player({ track, onNext, onPrev, onEnded }) {
@@ -17,6 +18,11 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
     const onEnd = () => {
       setPlaying(false)
       if (onEnded) onEnded()
+      // retract vinyl when playback ends
+      try {
+        const id = (track && ((track._id || track.id)))
+        if (id) setVinylState(String(id), { out: false, spinning: false })
+      } catch (err) {}
     }
 
     // Keep `playing` state in sync with the actual audio element so
@@ -24,12 +30,29 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
     const onPlay = () => setPlaying(true)
     const onPause = () => setPlaying(false)
 
+    // update vinyl state when audio play/pause occurs
+    const onPlayState = () => {
+      try {
+        const id = (track && ((track._id || track.id)))
+        if (id) setVinylState(String(id), { out: true, spinning: true })
+      } catch (err) {}
+    }
+    const onPauseState = () => {
+      try {
+        const id = (track && ((track._id || track.id)))
+        if (id) setVinylState(String(id), { spinning: false })
+      } catch (err) {}
+    }
+
     audio.addEventListener('loadedmetadata', onLoaded)
     audio.addEventListener('timeupdate', onTime)
     audio.addEventListener('ended', onEnd)
     audio.addEventListener('play', onPlay)
     audio.addEventListener('playing', onPlay)
     audio.addEventListener('pause', onPause)
+    audio.addEventListener('play', onPlayState)
+    audio.addEventListener('playing', onPlayState)
+    audio.addEventListener('pause', onPauseState)
 
     // initial sync
     setPlaying(!audio.paused)
@@ -41,6 +64,9 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('playing', onPlay)
       audio.removeEventListener('pause', onPause)
+      audio.removeEventListener('play', onPlayState)
+      audio.removeEventListener('playing', onPlayState)
+      audio.removeEventListener('pause', onPauseState)
     }
   }, [onEnded])
 
@@ -56,12 +82,22 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
     if (!audio) return
     if (!track || !track.src) return
 
+    // retract vinyl for previous track when switching
+    try {
+      const prevId = audioRef.current?._lastTrackId
+      const newId = (track && ((track._id || track.id)))
+      if (prevId && String(prevId) !== String(newId)) {
+        setVinylState(String(prevId), { out: false, spinning: false })
+      }
+    } catch (err) {}
+
     audio.src = track.src
     audio.load()
     setCurrentTime(0)
     setDuration(0)
     // attempt to autoplay on track change
     audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false))
+    try { if (audio) audio._lastTrackId = (track && ((track._id || track.id))) } catch (e) {}
   }, [track])
 
   const togglePlay = async () => {

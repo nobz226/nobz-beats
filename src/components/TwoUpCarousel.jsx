@@ -141,30 +141,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
         </div>
       </div>
 
-      {/* Navigation Arrows - Styled with Glassmorphism */}
-      {index > 0 && (
-        <button
-          onClick={handlePrev}
-          className="absolute left-[-3rem] top-[35%] -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white backdrop-blur-xl z-50 transition-all hover:bg-white/10 hover:border-white/20 hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer"
-          aria-label="Previous"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-      )}
-
-      {index + step < len && (
-        <button
-          onClick={handleNext}
-          className="absolute right-[-3rem] top-[35%] -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white backdrop-blur-xl z-50 transition-all hover:bg-white/10 hover:border-white/20 hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer"
-          aria-label="Next"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      )}
+      {/* Navigation arrows removed */}
 
       {/* Progress Dots */}
       {len > step && (

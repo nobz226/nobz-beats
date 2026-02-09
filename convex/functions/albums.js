@@ -17,3 +17,15 @@ export const deleteAlbum = mutation(async ({ db }, args) => {
   await db.table('albums').delete(id)
   return true
 })
+
+export const updateAlbum = mutation(async ({ db }, args) => {
+  // Expect a single object argument { id, patch }
+  const { id, patch: incomingPatch } = args || {}
+  let patch = incomingPatch
+  if (!id) return true
+
+  if (!patch || Object.keys(patch).length === 0) return true
+
+  await db.table('albums').patch(id, patch)
+  return true
+})

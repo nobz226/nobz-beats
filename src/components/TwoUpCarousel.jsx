@@ -11,7 +11,6 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
   // Ensure we only render valid React elements (guard against accidental plain objects)
   const items = React.Children.toArray(children).filter(c => React.isValidElement(c))
   const len = items.length
-  if (len === 0) return null
 
   const [index, setIndex] = useState(0)
   const containerRef = useRef(null)
@@ -70,6 +69,8 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
       if (raf.current) cancelAnimationFrame(raf.current)
     }
   }, [])
+
+  if (len === 0) return null
 
   return (
     <div 

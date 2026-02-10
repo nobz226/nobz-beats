@@ -13,7 +13,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-
+    const albumId = track && track.albumId
     const onLoaded = () => setDuration(audio.duration || 0)
     const onTime = () => setCurrentTime(audio.currentTime || 0)
     const onEnd = () => {
@@ -107,7 +107,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
         }
       } catch (e) {}
     }
-  }, [onEnded])
+  }, [onEnded, track])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -207,13 +207,13 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
       <audio ref={audioRef} src={track.src} preload="metadata" />
 
       <div 
-        className="w-[calc(100%-1rem)] max-w-[71.875rem] flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 py-3 md:py-2 px-3.5 rounded-xl md:rounded-[0.625rem] pointer-events-auto opacity-0 bg-[#1c1c1c]/95 shadow-[0_0.375rem_1.125rem_rgba(0,0,0,0.5)] border border-white/5 translate-y-3 animate-player-drop"
+        className="w-[calc(100%-2rem)] max-w-[48rem] flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 py-3 md:py-2 px-3.5 rounded-xl md:rounded-[0.625rem] pointer-events-auto opacity-0 bg-[#1c1c1c]/95 shadow-[0_0.375rem_1.125rem_rgba(0,0,0,0.5)] border border-white/5 translate-y-3 animate-player-drop"
         style={{ animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s + var(--title-fade) + var(--player-gap))' }}
       >
         <div className="flex items-center gap-3 w-full md:min-w-[11.25rem] md:w-auto">
           <img src={track.artwork} alt="Artwork" className="w-12 h-12 md:w-14 md:h-14 object-cover rounded-md" />
           <div className="flex flex-col overflow-hidden">
-            <div className="font-cal-sans font-semibold text-white text-sm md:text-base truncate">{track.title}</div>
+            <div className="font-cal-sans font-semibold text-white text-xs md:text-sm truncate">{track.title}</div>
             <div className="font-cutive font-normal text-white/90 text-[10px] md:text-xs truncate">{track.artist}</div>
           </div>
         </div>

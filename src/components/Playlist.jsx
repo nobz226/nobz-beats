@@ -92,28 +92,53 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
       const player = document.querySelector('.audio-player')
       const playerRect = player ? player.getBoundingClientRect() : null
 
+      // prefer symmetric gap between nav and playlist and between playlist and player
+      const desiredGap = 8 // px between nav/playlist and playlist/player
+      const minTop = Math.round(navRect.bottom + desiredGap)
+      const minHeight = 120
+
       if (playerRect) {
-        // try to position the playlist above the player with a 50px gap
-        const gapFromPlayer = 80
-        const maxSpaceAbovePlayer = Math.max(0, playerRect.top - gapFromPlayer - 8) // 8px safety for nav/top
+        // compute the vertical bounds where the playlist can live
+        const topBound = Math.round(navRect.bottom + desiredGap)
+        const bottomBound = Math.max(0, Math.round(playerRect.top - desiredGap))
+        const availableBetween = Math.max(0, bottomBound - topBound)
 
-        if (maxSpaceAbovePlayer >= 120) {
-          const h = Math.min(desiredHeight, maxSpaceAbovePlayer)
+        // If there's enough room, center the playlist vertically in that slot
+        if (availableBetween >= minHeight) {
+          const h = Math.min(desiredHeight, availableBetween)
+          // compute exact center line between nav bottom and player top then center element on it
+          const centerLine = (navRect.bottom + playerRect.top) / 2
+          let top = Math.round(centerLine - h / 2)
+          // clamp so element does not cross nav bottom or player top
+          const minAllowedTop = Math.round(navRect.bottom + desiredGap)
+          const maxAllowedTop = Math.round(playerRect.top - desiredGap - h)
+          if (top < minAllowedTop) top = minAllowedTop
+          if (top > maxAllowedTop) top = maxAllowedTop
+          el.style.top = top + 'px'
           el.style.height = h + 'px'
-          el.style.maxHeight = maxSpaceAbovePlayer + 'px'
-
-          // position so bottom is gapFromPlayer above the player's top
-          const top = Math.round(playerRect.top - h - gapFromPlayer)
-          // but don't move above the nav's top
-          el.style.top = Math.max(navRect.top, top) + 'px'
+          el.style.maxHeight = availableBetween + 'px'
           return
         }
+
+        // Not enough space to keep the full desiredGap; compute a reduced symmetric gap
+        const totalSpace = Math.max(0, playerRect.top - navRect.bottom)
+        const possibleGap = Math.max(4, Math.floor((totalSpace - minHeight) / 2))
+        const gapAdj = Math.min(desiredGap, possibleGap)
+        const newTopBound = Math.round(navRect.bottom + gapAdj)
+        const newBottomBound = Math.max(0, Math.round(playerRect.top - gapAdj))
+        const availableAfterAdj = Math.max(0, newBottomBound - newTopBound)
+        const h2 = Math.min(desiredHeight, Math.max(minHeight, availableAfterAdj))
+        const top2 = Math.round(newTopBound + Math.max(0, (availableAfterAdj - h2) / 2))
+        el.style.top = top2 + 'px'
+        el.style.height = Math.max(0, Math.min(h2, availableAfterAdj)) + 'px'
+        el.style.maxHeight = Math.max(0, availableAfterAdj) + 'px'
+        return
       }
 
-      // fallback: place starting at the nav top and grow downward without overlapping player
-      el.style.top = navRect.top + 'px'
-      const bottomReserved = playerRect ? (playerRect.height + 24) : 24
-      const available = Math.max(120, window.innerHeight - navRect.top - bottomReserved)
+      // No player: place below nav and grow downward
+      el.style.top = minTop + 'px'
+      const bottomReserved = 24
+      const available = Math.max(minHeight, window.innerHeight - minTop - bottomReserved)
       const h = Math.min(desiredHeight, available)
       el.style.height = h + 'px'
       el.style.maxHeight = available + 'px'

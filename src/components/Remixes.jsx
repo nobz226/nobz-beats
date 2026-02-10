@@ -85,18 +85,18 @@ export default function Remixes({ tracks = [], onPlay, onAdd }) {
 
   return (
     <section 
-      className={`latest-section fixed z-[1004] text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
+      className={`latest-section fixed ${isMobile ? 'z-[1000]' : 'z-[1004]'} text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
       style={{
         left: isMobile ? '0' : 'var(--main-left)',
         top: isMobile ? 'var(--main-top)' : 'calc(var(--main-top) - 1rem)',
-        bottom: isMobile ? '8rem' : '6rem',
+        bottom: isMobile ? '0' : '6rem',
         width: isMobile ? '100%' : 'auto',
         maxWidth: isMobile ? 'none' : 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
         animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'
       }}
       aria-label="Remixes"
     >
-      <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? 'px-4' : ''}`}>Remixes</h2>
+      <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? 'px-4 text-center' : ''}`}>Remixes</h2>
       
       {!isMobile ? (
         <TwoUpCarousel className="grid gap-8 md:gap-24 items-start justify-center mt-3 grid-cols-1 lg:grid-cols-[repeat(2,20rem)]">
@@ -106,9 +106,6 @@ export default function Remixes({ tracks = [], onPlay, onAdd }) {
         <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar flex flex-col gap-16 mt-6 pb-24 items-center px-4">
           {tracks.map(t => <RemixItem key={`mob-${t.id}`} track={t} onPlay={onPlay} onAdd={onAdd} />)}
         </div>
-      )}
-      {isMobile && (
-        {/* helper text removed */}
       )}
     </section>
   )

@@ -16,18 +16,18 @@ export default function Latest({ items = [], onPlay, onAdd, onPlayAlbum, onAddAl
   // `items` is an array of normalized objects with `kind: 'track'|'album'`.
   return (
     <section 
-      className={`latest-section fixed z-[1004] text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
+      className={`latest-section fixed ${isMobile ? 'z-[1000]' : 'z-[1004]'} text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? 'left-0 right-0 w-full flex flex-col overflow-hidden' : 'p-0 custom-scrollbar'}`}
       style={{
         left: isMobile ? '0' : 'var(--main-left)',
         top: isMobile ? 'var(--main-top)' : 'calc(var(--main-top) - 1rem)',
-        bottom: isMobile ? '8rem' : '6rem',
+        bottom: isMobile ? '0' : '6rem',
         width: isMobile ? '100%' : 'auto',
         maxWidth: isMobile ? 'none' : 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
         animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'
       }}
       aria-label="Latest release"
     >
-      <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? 'px-4' : ''}`}>Latest</h2>
+      <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? 'px-4 text-center' : ''}`}>Latest</h2>
       {!isMobile ? (
         <TwoUpCarousel className="grid gap-8 md:gap-24 items-start justify-center mt-3 grid-cols-1 lg:grid-cols-[20rem_1fr]">
           {items.map(it => {
@@ -66,9 +66,6 @@ export default function Latest({ items = [], onPlay, onAdd, onPlayAlbum, onAddAl
           })}
         </div>
       )}
-        {isMobile && (
-          {/* helper text removed */}
-        )}
     </section>
   )
 }

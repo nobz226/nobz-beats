@@ -8,7 +8,8 @@ import React, { useState, useRef, useEffect } from 'react'
  * - Proper arrow positioning at the edges of the 2-item view
  */
 export default function TwoUpCarousel({ children = [], step = 2, className = '' }) {
-  const items = React.Children.toArray(children)
+  // Ensure we only render valid React elements (guard against accidental plain objects)
+  const items = React.Children.toArray(children).filter(c => React.isValidElement(c))
   const len = items.length
   if (len === 0) return null
 
@@ -31,6 +32,12 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
 
   const handlePrev = () => { clearSuppress(); setIndex(i => Math.max(0, i - step)) }
   const handleNext = () => { clearSuppress(); setIndex(i => Math.min(len - step, i + step)) }
+
+  // The user wants a 2-up view on desktop.
+  // Each item is 20rem wide. Increase gap for more space between covers.
+  const itemWidthRem = 20
+  const gapWidthRem = 8
+  const carouselWidth = `${(itemWidthRem * 2) + gapWidthRem}rem`
 
   // compute slide width (px) based on first item and gap
   useEffect(() => {
@@ -64,15 +71,9 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
     }
   }, [])
 
-  // The user wants a 2-up view on desktop.
-  // Each item is 20rem wide. Increase gap for more space between covers.
-  const itemWidthRem = 20
-  const gapWidthRem = 8
-  const carouselWidth = `${(itemWidthRem * 2) + gapWidthRem}rem`
-
   return (
     <div 
-      className="carousel-container relative mx-auto group pb-0" 
+      className={`carousel-container relative mx-auto group pb-0 ${className}`.trim()} 
       style={{ width: carouselWidth }}
     >
       {/* Viewport for the sliding track */}

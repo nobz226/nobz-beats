@@ -200,7 +200,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
   return (
     <div 
-      className="audio-player fixed left-0 bottom-0 z-[1003] bg-transparent flex items-center justify-center py-2.5 w-full lg:right-[11.25rem] h-auto lg:h-[4.5rem]" 
+      className="audio-player fixed left-15 bottom-0 z-[1003] bg-transparent flex items-center justify-center py-2.5 w-full lg:right-[3.50rem] h-auto lg:h-[4.5rem]" 
       role="region" 
       aria-label="Audio player"
     >

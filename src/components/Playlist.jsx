@@ -154,6 +154,22 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
   }, [])
 
   const [expanded, setExpanded] = useState(false)
+  // Desktop visibility (persisted)
+  const [visible, setVisible] = useState(() => {
+    try {
+      const v = localStorage.getItem('playlist_visible')
+      return v === null ? true : v === '1'
+    } catch (e) {
+      return true
+    }
+  })
+
+  const toggleVisible = () => {
+    setVisible(v => {
+      try { localStorage.setItem('playlist_visible', v ? '0' : '1') } catch (e) {}
+      return !v
+    })
+  }
 
   return (
     <>
@@ -166,9 +182,10 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
       </button>
       <aside 
         ref={ref} 
-        className={`playlist fixed right-4 lg:right-auto lg:left-auto top-[4.6875rem] w-[calc(100vw-2rem)] md:max-w-[22.5rem] h-auto max-h-[calc(100vh-12rem)] md:max-h-[calc(100vh-7.5rem)] overflow-y-auto overflow-x-hidden custom-scrollbar z-[1010] text-white p-3 rounded-lg bg-[#1c1c1c]/95 lg:bg-white/[0.03] backdrop-blur-xl lg:backdrop-blur-none border border-white/[0.05] lg:border-none shadow-2xl lg:shadow-none transition-all duration-500 ease-[cubic-bezier(0.22,0.8,0.25,1)] ${expanded ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-[120%] opacity-0 pointer-events-none lg:translate-x-0 lg:opacity-100 lg:pointer-events-auto'} font-cutive`}
+        className={`playlist fixed right-4 lg:right-auto lg:left-auto top-[4.6875rem] w-[calc(100vw-2rem)] md:max-w-[22.5rem] h-auto max-h-[calc(100vh-12rem)] md:max-h-[calc(100vh-7.5rem)] overflow-y-auto overflow-x-hidden custom-scrollbar z-[1010] text-white p-3 rounded-lg bg-[#1c1c1c]/95 lg:bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] lg:border-none shadow-2xl lg:shadow-none transition-all duration-500 ease-[cubic-bezier(0.22,0.8,0.25,1)] ${expanded ? 'translate-x-0 opacity-100 pointer-events-auto' : (visible ? 'translate-x-[120%] opacity-0 pointer-events-none lg:translate-x-0 lg:opacity-100 lg:pointer-events-auto' : 'translate-x-[120%] opacity-0 pointer-events-none lg:translate-x-[120%] lg:opacity-0 lg:pointer-events-none')} font-cutive`}
         aria-label="Playlist"
       >
+      
       {currentTrack && (
         <div className="flex gap-3 items-center py-2 pb-3 mb-2 border-b border-white/[0.03]" aria-label="Currently playing">
           <img className="w-[3.25rem] h-[3.25rem] object-cover rounded-md" src={currentTrack.artwork || '/artwork/default.png'} alt="Artwork" />
@@ -243,6 +260,15 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
         ))}
       </ul>
       </aside>
+      {/* Desktop toggle button to hide/unhide playlist (outside aside so it's always reachable) */}
+      <button
+        title={visible ? 'Hide playlist' : 'Show playlist'}
+        aria-label={visible ? 'Hide playlist' : 'Show playlist'}
+        onClick={toggleVisible}
+        className="hidden lg:flex fixed right-2 top-1/2 z-[1011] -translate-y-1/2 items-center justify-center w-9 h-9 bg-white/5 text-white rounded-full border border-white/[0.06] hover:bg-white/10"
+      >
+        {visible ? '◀' : '▶'}
+      </button>
     </>
   )
 }

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useMutation } from 'convex/react'
-import { uploadToCloudinary } from '../../lib/cloudinary.js'
+import { uploadToStorage } from '../../lib/storage.js'
 
-// helper to upload to Convex HTTP endpoints with robust error messages (unused now, using Cloudinary)
+// helper to upload to Convex HTTP endpoints with robust error messages
 // ... (removed)
 
 export default function AddAlbum() {
@@ -19,7 +19,7 @@ export default function AddAlbum() {
     try {
       let artwork = '/artwork/default.png'
       if (artFile) {
-        artwork = await uploadToCloudinary(artFile)
+        artwork = await uploadToStorage(artFile)
       }
       const payload = { title, description, artwork, createdAt: Date.now() }
       await createAlbum(payload)

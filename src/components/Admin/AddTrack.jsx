@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useQuery, useMutation } from 'convex/react'
-import { uploadToCloudinary } from '../../lib/cloudinary.js'
+import { uploadToStorage } from '../../lib/storage.js'
 
-// helper to upload to Convex HTTP endpoints with robust error messages (unused now, using Cloudinary)
+  // helper to upload to Convex HTTP endpoints with robust error messages
 // ... (removed)
 
 export default function AddTrack() {
@@ -24,7 +24,7 @@ export default function AddTrack() {
     try {
       let artworkUrl = '/artwork/default.png'
       if (artFile) {
-        artworkUrl = await uploadToCloudinary(artFile)
+        artworkUrl = await uploadToStorage(artFile)
       } else if (type === 'album' && albumId) {
         const alb = albums.find(a => (a._id || a.id) === albumId)
         if (alb && alb.artwork) artworkUrl = alb.artwork
@@ -32,7 +32,7 @@ export default function AddTrack() {
 
       let audioUrl = ''
       if (audioFile) {
-        audioUrl = await uploadToCloudinary(audioFile)
+        audioUrl = await uploadToStorage(audioFile)
       } else {
         throw new Error('Audio file is required')
       }

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { useQuery, useMutation } from 'convex/react'
-import { uploadToCloudinary } from '../../lib/cloudinary.js'
+import { uploadToStorage } from '../../lib/storage.js'
 
 export default function AlbumsList() {
   const albums = useQuery('functions/albums:listAlbums') || []
@@ -48,7 +48,7 @@ export default function AlbumsList() {
     try {
       let artworkUrl = editing.artwork || ''
       if (editing.artFile) {
-        artworkUrl = await uploadToCloudinary(editing.artFile)
+        artworkUrl = await uploadToStorage(editing.artFile)
       }
 
       // update album doc

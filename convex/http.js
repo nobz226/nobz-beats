@@ -65,6 +65,10 @@ export const optionsOk = httpAction(async (ctx, request) => {
 
 export const uploadArtwork = httpAction(async ({ storage }, request) => {
   try {
+    if (!storage || (typeof storage.put !== 'function' && typeof storage.store !== 'function')) {
+      console.error('[uploadArtwork] Convex Storage unavailable or misconfigured', storage)
+      return jsonResponse({ error: 'Convex Storage unavailable on this deployment' }, 503)
+    }
     const { fileBuffer, fileInfo } = await readMultipartBody(request)
     if (!fileBuffer || !fileInfo) return jsonResponse({ error: 'no file' }, 400)
 
@@ -75,8 +79,16 @@ export const uploadArtwork = httpAction(async ({ storage }, request) => {
     if ((fileBuffer.byteLength || fileBuffer.length) > MAX_IMAGE) return jsonResponse({ error: 'file too large' }, 413)
 
     const name = `artwork/${Date.now()}-${fileInfo.filename}`
-    const key = await storage.put(name, fileBuffer, { contentType: fileInfo.mimeType })
-    const url = storage.getUrl(key)
+    let storageId
+    if (typeof storage.put === 'function') {
+      // older API: put(name, bytes, opts) -> key
+      storageId = await storage.put(name, fileBuffer, { contentType: fileInfo.mimeType })
+    } else {
+      // newer API: store(blob) -> storage id
+      const blob = new Blob([fileBuffer], { type: fileInfo.mimeType })
+      storageId = await storage.store(blob)
+    }
+    const url = typeof storage.getUrl === 'function' ? await storage.getUrl(storageId) : null
     return jsonResponse({ url }, 200)
   } catch (err) {
     console.error('[uploadArtwork] unexpected error', err)
@@ -86,6 +98,10 @@ export const uploadArtwork = httpAction(async ({ storage }, request) => {
 
 export const uploadAudio = httpAction(async ({ storage }, request) => {
   try {
+    if (!storage || (typeof storage.put !== 'function' && typeof storage.store !== 'function')) {
+      console.error('[uploadAudio] Convex Storage unavailable or misconfigured', storage)
+      return jsonResponse({ error: 'Convex Storage unavailable on this deployment' }, 503)
+    }
     const { fileBuffer, fileInfo } = await readMultipartBody(request)
     if (!fileBuffer || !fileInfo) return jsonResponse({ error: 'no file' }, 400)
 
@@ -96,8 +112,14 @@ export const uploadAudio = httpAction(async ({ storage }, request) => {
     if ((fileBuffer.byteLength || fileBuffer.length) > MAX_AUDIO) return jsonResponse({ error: 'file too large' }, 413)
 
     const name = `audio/${Date.now()}-${fileInfo.filename}`
-    const key = await storage.put(name, fileBuffer, { contentType: fileInfo.mimeType })
-    const url = storage.getUrl(key)
+    let storageId
+    if (typeof storage.put === 'function') {
+      storageId = await storage.put(name, fileBuffer, { contentType: fileInfo.mimeType })
+    } else {
+      const blob = new Blob([fileBuffer], { type: fileInfo.mimeType })
+      storageId = await storage.store(blob)
+    }
+    const url = typeof storage.getUrl === 'function' ? await storage.getUrl(storageId) : null
     return jsonResponse({ url }, 200)
   } catch (err) {
     console.error('[uploadAudio] unexpected error', err)
@@ -105,46 +127,7 @@ export const uploadAudio = httpAction(async ({ storage }, request) => {
   }
 })
 
-// Cloudinary signing endpoint: returns timestamp + signature + api_key + cloud
-export const cloudinarySign = httpAction(async (ctx, request) => {
-  try {
-    const cloud = process.env.CLOUDINARY_CLOUD_NAME || process.env.VITE_CLOUDINARY_CLOUD_NAME
-    const apiKey = process.env.CLOUDINARY_API_KEY || process.env.VITE_CLOUDINARY_API_KEY
-    const apiSecret = process.env.CLOUDINARY_API_SECRET || process.env.VITE_CLOUDINARY_API_SECRET
-    if (!cloud || !apiKey || !apiSecret) {
-      return jsonResponse({ error: 'cloudinary not configured' }, 503)
-    }
-
-    const timestamp = Math.floor(Date.now() / 1000)
-
-    async function sha1Hex(input) {
-      if (globalThis.crypto?.subtle?.digest) {
-        const data = new TextEncoder().encode(input)
-        const digest = await crypto.subtle.digest('SHA-1', data)
-        const bytes = new Uint8Array(digest)
-        return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
-      }
-      try {
-        // Node fallback if available
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const cryptoNode = require('crypto')
-        return cryptoNode.createHash('sha1').update(input).digest('hex')
-      } catch (e) {
-        console.error('[cloudinarySign] no crypto available', e.message)
-        return null
-      }
-    }
-
-    const toSign = `timestamp=${timestamp}${apiSecret}`
-    const signature = await sha1Hex(toSign)
-    if (!signature) return jsonResponse({ error: 'crypto unavailable' }, 500)
-
-    return jsonResponse({ cloud, api_key: apiKey, timestamp, signature })
-  } catch (err) {
-    console.error('[cloudinarySign] unexpected error', err)
-    return jsonResponse({ error: 'internal server error' }, 500)
-  }
-})
+// Cloudinary signing removed: uploads now go to Convex Storage endpoints
 
 import { httpRouter } from 'convex/server'
 
@@ -154,7 +137,6 @@ router.route({ path: '/upload/artwork', method: 'OPTIONS', handler: optionsOk })
 router.route({ path: '/upload/audio', method: 'POST', handler: uploadAudio })
 router.route({ path: '/upload/audio', method: 'OPTIONS', handler: optionsOk })
 
-router.route({ path: '/cloudinary/sign', method: 'POST', handler: cloudinarySign })
-router.route({ path: '/cloudinary/sign', method: 'OPTIONS', handler: optionsOk })
+// cloudinary signing endpoints removed
 
 export default router

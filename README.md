@@ -27,7 +27,7 @@ npm run build
 Project overview
 
 - Client: a Vite + React single-page application located in the `src/` folder. The app implements client-side routing (history API) to support routes like `/latest`, `/singles`, `/albums`, etc.
-- Backend: Convex is used for data storage and serverless functions. Convex server code lives in the `convex/` folder and defines the database schema, server functions, and HTTP actions for uploads and Cloudinary signing.
+-- Backend: Convex is used for data storage and serverless functions. Convex server code lives in the `convex/` folder and defines the database schema, server functions, and HTTP actions for uploads.
 - Static assets: `assets/` is treated as Vite's public directory (configured via `vite.config.js`) and is copied to the build output. Global CSS is in `css/styles.css`.
 
 Repository structure (important files)
@@ -39,11 +39,11 @@ Repository structure (important files)
 	- `main.jsx` — app entry: creates Convex client and mounts `App`.
 	- `App.jsx` — main application: routes, queries data, manages playlist and player state.
 	- `components/` — UI components (Player, Nav, Latest, Albums, Admin, etc.).
-	- `lib/` — small helpers: `vinyl.js` (global play-state bus) and `cloudinary.js` (upload helper).
+	- `lib/` — small helpers: `vinyl.js` (global play-state bus) and `storage.js` (upload helper).
 - `convex/` — Convex backend:
 	- `schema.js` — database tables (`tracks`, `albums`).
 	- `functions/` — Convex query/mutation functions used by the client (e.g. `listTracks`, `createTrack`).
-	- `http.js` — HTTP actions exposed by Convex for uploads and Cloudinary signing.
+	- `http.js` — HTTP actions exposed by Convex for uploads.
 
 How the app is wired (data flow)
 
@@ -55,12 +55,10 @@ How the app is wired (data flow)
 	 - The main app uses `useQuery('functions/tracks:listTracks')` and `useQuery('functions/albums:listAlbums')` (Convex React hooks) to read data. These functions are implemented in `convex/functions/*.js` and return arrays of documents.
 
 3. Client mutations & uploads:
-	 - To create or update tracks/albums the UI (Admin pages) calls Convex mutation functions in `convex/functions/`.
-	 - For file uploads (artwork/audio) there are two supported approaches:
-		 - Upload to Convex Storage via the HTTP actions defined in `convex/http.js`:
-			 - `POST /upload/artwork` expects multipart `file` or raw bytes and returns a `url` pointing to the stored object.
-			 - `POST /upload/audio` similar for audio files.
-		 - Signed Cloudinary uploads: `src/lib/cloudinary.js` calls `/cloudinary/sign` (Convex HTTP action) to obtain a signature, then uploads directly to Cloudinary from the browser.
+ 	- To create or update tracks/albums the UI (Admin pages) calls Convex mutation functions in `convex/functions/`.
+ 	- For file uploads (artwork/audio) the app uploads files to Convex Storage via the HTTP actions defined in `convex/http.js`:
+ 		- `POST /upload/artwork` expects multipart `file` or raw bytes and returns a `url` pointing to the stored object.
+ 		- `POST /upload/audio` similar for audio files.
 
 Key client pieces
 
@@ -81,25 +79,18 @@ Convex backend details
 - `convex/functions/*.js` implement server-side queries and mutations. Example:
 	- `listTracks` returns all `tracks` documents.
 	- `createTrack` inserts a new track with `createdAt: Date.now()` and normalizes `albumId` (removes `null`).
-- `convex/http.js` exposes HTTP endpoints for uploads and a Cloudinary signing endpoint. These endpoints use `storage.put` to store bytes in Convex Storage and return a `url`.
+-- `convex/http.js` exposes HTTP endpoints for uploads. These endpoints use `storage.put` to store bytes in Convex Storage and return a `url`.
 
 Environment variables (important)
 
 - `VITE_CONVEX_URL` or `VITE_CONVEX_SITE_URL` — Convex client/site URL used by the browser app. Set this in your Vite `.env` as `VITE_CONVEX_URL=https://your-convex-site.convex.cloud` or similar.
-- Cloudinary signing (optional): server-side environment variables used by the Convex HTTP action:
-	- `CLOUDINARY_API_KEY`
-	- `CLOUDINARY_API_SECRET`
-	- `CLOUDINARY_CLOUD_NAME`
-- Client-side Cloudinary config (if using unsigned presets or to detect availability):
-	- `VITE_CLOUDINARY_UPLOAD_PRESET`
-	- `VITE_CLOUDINARY_CLOUD_NAME`
+- The important env vars for running the app are:
+ 	- `VITE_CONVEX_URL` or `VITE_CONVEX_SITE_URL`
 
 Example `.env` (for local dev with Vite):
 
 ```text
 VITE_CONVEX_URL=https://dev-your-site.convex.cloud
-VITE_CLOUDINARY_CLOUD_NAME=yourcloud
-VITE_CLOUDINARY_UPLOAD_PRESET=unsigned_preset
 ```
 
 Notes and gotchas
@@ -136,7 +127,7 @@ convex dev
 curl -X POST -F "file=@cover.png" https://your-convex-site.convex.cloud/upload/artwork
 ```
 
-- Use Cloudinary signed uploads from the client: the client requests `/cloudinary/sign` to obtain a signature and then posts directly to Cloudinary.
+-- Uploads from the client post to Convex `/upload/*` endpoints which return a `url` to store in DB documents.
 
 Where to look when things break
 
@@ -153,7 +144,7 @@ Tips for extending the app
 
 - Replace Convex with another backend: Convex is used for both DB and simple HTTP actions in this project. To swap it out you'll need to:
 	1. Replace Convex queries/mutations in `src/` with API calls to your new backend.
-	2. Implement equivalent upload endpoints and storage (S3/Cloudinary/etc.).
+	2. Implement equivalent upload endpoints and storage (S3/etc.).
 
 Maintenance suggestions
 

@@ -154,13 +154,13 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
   }, [])
 
   const [expanded, setExpanded] = useState(false)
-  // Desktop visibility (persisted)
+  // Desktop visibility (persisted). Default to hidden on first load.
   const [visible, setVisible] = useState(() => {
     try {
       const v = localStorage.getItem('playlist_visible')
-      return v === null ? true : v === '1'
+      return v === null ? false : v === '1'
     } catch (e) {
-      return true
+      return false
     }
   })
 
@@ -170,6 +170,74 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
       return !v
     })
   }
+
+  const toggleRef = React.useRef(null)
+  const [highlight, setHighlight] = useState(false)
+  const prevLenRef = useRef((tracks && tracks.length) || 0)
+
+  // When playlist receives items while hidden, enable highlight and keep it
+  // until the user expands or shows the playlist.
+  useEffect(() => {
+    const prev = prevLenRef.current || 0
+    const cur = (tracks && tracks.length) || 0
+    // If the playlist grows (user added track(s)) while hidden, enable highlight.
+    if (cur > prev && !visible) {
+      setHighlight(true)
+    }
+    prevLenRef.current = cur
+  }, [tracks && tracks.length, visible])
+
+  // Clear highlight when playlist is shown/expanded by the user
+  useEffect(() => {
+    if (visible || expanded) setHighlight(false)
+  }, [visible, expanded])
+
+  // Position the desktop toggle so it sits half-over the playlist's left edge
+  React.useEffect(() => {
+    const btn = toggleRef.current
+    const el = ref.current
+    if (!btn) return
+
+    const update = () => {
+      try {
+        // If playlist hidden, keep button at right edge
+        if (!visible) {
+          btn.style.left = ''
+          btn.style.right = '0.5rem'
+          return
+        }
+        if (!el) return
+        const rect = el.getBoundingClientRect()
+        const btnW = btn.offsetWidth || 36
+        const left = Math.max(8, Math.round(rect.left - btnW / 2))
+        btn.style.left = left + 'px'
+        // override class `right-2` by setting inline right to auto
+        btn.style.right = 'auto'
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // run on next frame to catch CSS transitions
+    requestAnimationFrame(update)
+    window.addEventListener('resize', update)
+    const mo = new MutationObserver(update)
+    if (el) mo.observe(el, { attributes: true, childList: true, subtree: true })
+    // reposition after CSS transitions/animations finish
+    if (el) {
+      el.addEventListener('transitionend', update)
+      el.addEventListener('animationend', update)
+    }
+
+    return () => {
+      window.removeEventListener('resize', update)
+      if (el) {
+        el.removeEventListener('transitionend', update)
+        el.removeEventListener('animationend', update)
+      }
+      mo.disconnect()
+    }
+  }, [visible, expanded])
 
   return (
     <>
@@ -265,9 +333,10 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
         title={visible ? 'Hide playlist' : 'Show playlist'}
         aria-label={visible ? 'Hide playlist' : 'Show playlist'}
         onClick={toggleVisible}
-        className="hidden lg:flex fixed right-2 top-1/2 z-[1011] -translate-y-1/2 items-center justify-center w-9 h-9 bg-white/5 text-white rounded-full border border-white/[0.06] hover:bg-white/10"
+        ref={toggleRef}
+        className={`hidden lg:flex fixed right-2 top-1/2 z-[1011] -translate-y-1/2 items-center justify-center w-9 h-9 bg-white/5 text-white rounded-full border border-white/[0.06] hover:bg-white/10 transition-all ${highlight ? 'ring-4 ring-white/30 pulse-highlight' : ''}`}
       >
-        {visible ? '◀' : '▶'}
+        {visible ? '▶' : '◀'}
       </button>
     </>
   )

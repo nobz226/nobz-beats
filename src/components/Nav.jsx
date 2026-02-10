@@ -67,7 +67,7 @@ export default function Nav() {
     return () => { window.removeEventListener('resize', updatePos); mo.disconnect() }
   }, [])
 
-  const navItemClass = "text-white no-underline font-doto text-2xl font-medium py-2 px-3 rounded-md opacity-0 hover:bg-white/[0.08] focus:bg-white/[0.08] focus:outline-none focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+  const navItemClass = "text-white no-underline font-doto text-lg md:text-2xl font-medium py-2 px-3 rounded-md opacity-0 hover:bg-white/[0.08] focus:bg-white/[0.08] focus:outline-none focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
   const navItemStyle = {
     fontOpticalSizing: 'auto',
     fontStyle: 'normal',
@@ -79,7 +79,7 @@ export default function Nav() {
   }
 
   return (
-    <nav ref={navRef} className="site-nav fixed top-4 lg:top-[4.6875rem] right-4 lg:right-20 flex flex-col lg:flex-row items-end lg:items-center gap-4 z-[1002]" aria-label="Primary navigation">
+    <nav ref={navRef} className="site-nav fixed top-4 lg:top-[4.6875rem] right-4 lg:right-20 w-full lg:w-auto flex flex-col lg:flex-row items-end lg:items-center gap-4 z-[1002]" aria-label="Primary navigation">
       <button
         className="lg:hidden relative z-[1102] text-[1.625rem] p-2 cursor-pointer rounded-lg border-none text-white bg-white/[0.03] hover:bg-white/[0.08]"
         aria-label={open ? 'Close menu' : 'Open menu'}
@@ -89,7 +89,7 @@ export default function Nav() {
         {open ? '✕' : '☰'}
       </button>
 
-      <div className={`${open ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row gap-4 items-end lg:items-center bg-[#1c1c1c]/95 lg:bg-transparent p-6 lg:p-0 rounded-xl shadow-2xl lg:shadow-none border border-white/[0.05] lg:border-none backdrop-blur-lg lg:backdrop-blur-none z-[1101]`} onClick={onClick}>
+      <div className={`${open ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row gap-4 flex-wrap items-end lg:items-center bg-[#1c1c1c]/95 lg:bg-transparent p-6 lg:p-0 rounded-xl shadow-2xl lg:shadow-none border border-white/[0.05] lg:border-none backdrop-blur-lg lg:backdrop-blur-none z-[1101]`} onClick={onClick}>
         <a href="/singles" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.12s)'}}>&gt;Singles</a>
         <a href="/albums" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.24s)'}}>&gt;Albums</a>
         <a href="/remixes" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.36s)'}}>&gt;Remixes</a>

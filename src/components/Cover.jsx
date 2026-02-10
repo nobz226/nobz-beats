@@ -177,9 +177,11 @@ export default function Cover({ track, onPlay, className, sleeveImage }) {
     const dx = (e.clientX - cx) / rect.width
     const dy = (e.clientY - cy) / rect.height
 
-    const maxSleeve = 10
-    const maxVinyl = 18
-    const maxTilt = 25
+    // Scale parallax intensity based on cover size so effects are subtler on small screens
+    const baseScale = Math.max(0.35, Math.min(1, rect.width / 200))
+    const maxSleeve = 10 * baseScale
+    const maxVinyl = 18 * baseScale
+    const maxTilt = 25 * baseScale
 
     const sx = (dx * maxSleeve).toFixed(2) + 'px'
     const sy = (dy * maxSleeve).toFixed(2) + 'px'

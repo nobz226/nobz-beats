@@ -236,7 +236,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
               value={currentTime}
               step="0.01"
               onChange={onSeek}
-              className="flex-1 accent-white"
+              className="flex-1 accent-red-500"
             />
             <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(duration)}</span>
           </div>
@@ -253,7 +253,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
               step="0.01"
               value={volume}
               onChange={(e) => setVolume(Number(e.target.value))}
-              className="w-20 accent-white"
+              className="w-20 accent-red-500"
             />
           </div>
         </div>

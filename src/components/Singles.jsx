@@ -62,7 +62,6 @@ export function SingleItem({ track, onPlay, onAdd, className = '' }) {
       <Cover track={t} onPlay={onPlay} className="mr-4" sleeveImage="/artwork/single.jpg" />
       <div className="font-cutive text-center">
         <strong className="block text-lg font-bold">{t.title}</strong>
-        <div className="mt-1.5">{t.type}</div>
         <p className="max-w-80 mx-auto mt-2 leading-relaxed text-center text-[0.9375rem] break-words">{t.description}</p>
         <div className="mt-2 flex gap-2 justify-center">
           <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>

@@ -160,7 +160,7 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
               className={`carousel-item flex-shrink-0 w-[20rem] transition-opacity duration-700 ${
                  i >= index && i < index + step ? 'opacity-100' : 'opacity-20 scale-95'
                }`}
-              style={{ pointerEvents: suppressClicks ? 'none' : undefined }}
+              style={{ pointerEvents: (i >= index && i < index + step && !suppressClicks) ? undefined : 'none' }}
             >
               {child}
             </div>

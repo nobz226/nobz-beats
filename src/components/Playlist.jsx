@@ -248,7 +248,7 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
         onClick={() => setExpanded(!expanded)}
         aria-label="Toggle Playlist"
       >
-        {expanded ? '✕' : '🎵'}
+        {expanded ? <ion-icon name="close-outline" class="text-xl"></ion-icon> : <ion-icon name="musical-notes-outline" class="text-xl"></ion-icon>}
       </button>
       <aside 
         ref={ref} 
@@ -268,9 +268,9 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
       <div className="flex justify-between items-center">
         <h3 className="font-cal-sans font-bold text-lg m-0">Playlist</h3>
         <div className="flex gap-2">
-          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Play playlist" onClick={() => onPlayPlaylist && onPlayPlaylist()}>▶</button>
-          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Shuffle playlist" onClick={() => onShuffle && onShuffle()}>🔀</button>
-          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Clear playlist" onClick={() => onClear && onClear()}>✖</button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Play playlist" onClick={() => onPlayPlaylist && onPlayPlaylist()}><ion-icon name="play" className="text-xl text-white"></ion-icon></button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Shuffle playlist" onClick={() => onShuffle && onShuffle()}><ion-icon name="shuffle-outline" class="text-xl"></ion-icon></button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Clear playlist" onClick={() => onClear && onClear()}><ion-icon name="close-outline" class="text-xl"></ion-icon></button>
         </div>
       </div>
 
@@ -344,19 +344,19 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
                           if (onSelect) onSelect(t)
                           setTimeout(() => { try { audio.play().catch(() => {}) } catch (e) {} }, 50)
                         }}
-                      >{isThisPlaying ? '⏸' : '▶'}</button>
+                      ><ion-icon name={isThisPlaying ? 'pause' : 'play'} className="text-xl text-white"></ion-icon></button>
 
-                      <button
-                        className="bg-transparent border-none text-white cursor-pointer text-xl font-semibold p-1.5 rounded-md hover:bg-white/[0.04]"
-                        aria-label="Remove from playlist"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          try {
-                            if (!confirm('Remove this track from the playlist?')) return
-                            if (onRemove) onRemove(t.id)
-                          } catch (err) { console.error('Failed to remove from playlist', err) }
-                        }}
-                      >−</button>
+                        <button
+                          className="bg-transparent border-none text-white cursor-pointer text-xl font-semibold p-1.5 rounded-md hover:bg-white/[0.04]"
+                          aria-label="Remove from playlist"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            try {
+                              if (!confirm('Remove this track from the playlist?')) return
+                              if (onRemove) onRemove(t.id)
+                            } catch (err) { console.error('Failed to remove from playlist', err) }
+                          }}
+                        ><ion-icon name="remove-circle" className="text-xl text-white"></ion-icon></button>
                     </>
                   )
                 })()}

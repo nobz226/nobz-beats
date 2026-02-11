@@ -220,11 +220,11 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
         <div className="flex flex-col md:flex-row items-center w-full md:w-auto gap-2 md:gap-4 flex-1">
           <div className="flex gap-4 items-center justify-center">
-            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Previous" onClick={handlePrev}>⏮</button>
+            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Previous" onClick={handlePrev}><ion-icon name="play-skip-back" className="text-xl text-white"></ion-icon></button>
             <button className="bg-transparent border-none text-white cursor-pointer text-2xl p-1 rounded-md hover:bg-white/[0.04]" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
-              {playing ? '⏸' : '▶'}
+              {playing ? <ion-icon name="pause" className="text-2xl text-white"></ion-icon> : <ion-icon name="play" className="text-2xl text-white"></ion-icon>}
             </button>
-            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Next" onClick={handleNext}>⏭</button>
+            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Next" onClick={handleNext}><ion-icon name="play-skip-forward" className="text-xl text-white"></ion-icon></button>
           </div>
           <div className="flex items-center gap-2 w-full max-w-md">
             <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(currentTime)}</span>
@@ -244,7 +244,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
         <div className="hidden md:flex items-center gap-2 min-w-20 justify-end">
           <div className="flex items-center gap-2">
-            <span className="text-white text-base">🔊</span>
+            <ion-icon name="volume-high" className="text-white text-base"></ion-icon>
             <input
               aria-label="Volume"
               type="range"

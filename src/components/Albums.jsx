@@ -79,8 +79,8 @@ export function AlbumItem({ track, onPlayAlbum, onAddAlbum, className = '' }) {
         <div className="mt-1.5">{a.type}</div>
         <p className="max-w-80 mx-auto mt-2 leading-relaxed text-center text-[0.9375rem] break-words">{a.description}</p>
         <div className="mt-2 flex gap-2 justify-center">
-          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>
-          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Add album to playlist" onClick={(e) => { e.stopPropagation(); onAddAlbum && onAddAlbum(a) }}>＋</button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}>{isPlaying ? <ion-icon name="pause" className="text-xl text-white"></ion-icon> : <ion-icon name="play" className="text-xl text-white"></ion-icon>}</button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Add album to playlist" onClick={(e) => { e.stopPropagation(); onAddAlbum && onAddAlbum(a) }}><ion-icon name="add-circle" className="text-xl text-white"></ion-icon></button>
         </div>
       </div>
     </div>

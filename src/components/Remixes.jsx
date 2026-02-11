@@ -64,8 +64,8 @@ export function RemixItem({ track, onPlay, onAdd, className = '' }) {
         <strong className="block text-lg font-bold">{t.title}</strong>
         <p className="max-w-80 mx-auto mt-2 leading-relaxed text-center text-[0.9375rem] break-words">{t.description}</p>
         <div className="mt-2 flex gap-2 justify-center">
-          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}>{isPlaying ? '⏸' : '▶'}</button>
-          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Add to playlist" onClick={() => onAdd && onAdd(t)}>＋</button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label={isPlaying ? 'Pause' : 'Play'} onClick={handleTogglePlay}><ion-icon name={isPlaying ? 'pause' : 'play'} className="text-xl text-white"></ion-icon></button>
+          <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Add to playlist" onClick={() => onAdd && onAdd(t)}><ion-icon name="add-circle" className="text-xl text-white"></ion-icon></button>
         </div>
       </div>
     </div>

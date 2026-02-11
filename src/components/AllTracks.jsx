@@ -40,8 +40,8 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
         left: isMobile ? '0' : 'var(--main-left)',
         top: isMobile ? 'var(--main-top)' : 'calc(var(--main-top) - 1rem)',
         bottom: isMobile ? '8rem' : 'auto',
-        width: isMobile ? '100%' : 'auto',
-        maxWidth: isMobile ? 'none' : 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
+        width: isMobile ? '100%' : 'calc(100% - (var(--logo-size) + var(--logo-gap) + 5rem))',
+        maxWidth: isMobile ? 'none' : 'none',
         animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'
       }}
       aria-label="All tracks"
@@ -69,14 +69,14 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
                   <button
                     className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]"
                     aria-label={isThisPlaying ? 'Pause' : 'Play'}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      const audio = document.querySelector('.audio-player audio')
-                      if (!audio) {
-                        if (onPlay) onPlay(it)
-                        return
-                      }
-                      const a = audio.src || ''
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const audio = document.querySelector('.audio-player audio')
+                    if (!audio) {
+                      if (onPlay) onPlay(it)
+                      return
+                    }
+                    const a = audio.src || ''
                       const s = it.src || ''
                       const isMatch = s && (a.endsWith(s) || a.includes(s))
                       if (isMatch) {
@@ -99,8 +99,8 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
                         playVinyl(String(it.id || it._id), it.albumId)
                       } catch (e) {}
                     }}
-                  >{isThisPlaying ? '⏸' : '▶'}</button>
-                  <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Add to playlist" onClick={() => onAdd && onAdd(it)}>＋</button>
+                  ><ion-icon name={isThisPlaying ? 'pause' : 'play'} className="text-xl text-white"></ion-icon></button>
+                  <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]" aria-label="Add to playlist" onClick={() => onAdd && onAdd(it)}><ion-icon name="add-circle" className="text-xl text-white"></ion-icon></button>
                 </div>
               </div>
             </li>

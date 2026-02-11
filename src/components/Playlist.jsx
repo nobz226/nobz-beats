@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { playVinyl, pauseVinyl } from '../lib/vinyl'
 
-export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, onRemove, currentTrackId, currentTrack }) {
+export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, onRemove, onReorder, currentTrackId, currentTrack }) {
   // tracks passed from app state (playlist)
   const [durations, setDurations] = useState({})
   // load durations for playlist tracks
@@ -174,6 +174,8 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
   const toggleRef = React.useRef(null)
   const [highlight, setHighlight] = useState(false)
   const prevLenRef = useRef((tracks && tracks.length) || 0)
+  const [draggingIdx, setDraggingIdx] = useState(null)
+  const [dragOverIdx, setDragOverIdx] = useState(null)
 
   // When playlist receives items while hidden, enable highlight and keep it
   // until the user expands or shows the playlist.
@@ -273,10 +275,32 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
       </div>
 
       <ul className="list-none m-0 p-0 flex flex-col gap-2 mt-3">
-        {tracks.map(t => (
+        {tracks.map((t, idx) => (
           <li 
             key={t.id} 
-            className={`py-1.5 px-2 rounded-md cursor-pointer hover:bg-white/[0.04] focus:outline-none focus:bg-white/[0.04] ${currentTrackId === t.id ? 'bg-gradient-to-r from-white/[0.03] to-white/[0.01] border-l-[3px] border-[#c8c8c8]' : ''}`} 
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', String(idx))
+              e.dataTransfer.effectAllowed = 'move'
+              setDraggingIdx(idx)
+            }}
+            onDragOver={(e) => {
+              e.preventDefault()
+              e.dataTransfer.dropEffect = 'move'
+              setDragOverIdx(idx)
+            }}
+            onDrop={(e) => {
+              e.preventDefault()
+              const from = parseInt(e.dataTransfer.getData('text/plain'), 10)
+              const to = idx
+              setDraggingIdx(null)
+              setDragOverIdx(null)
+              if (!Number.isNaN(from) && typeof onReorder === 'function' && from !== to) {
+                try { onReorder(from, to) } catch (err) { console.error('onReorder error', err) }
+              }
+            }}
+            onDragEnd={() => { setDraggingIdx(null); setDragOverIdx(null) }}
+            className={`py-1.5 px-2 rounded-md cursor-pointer hover:bg-white/[0.04] focus:outline-none focus:bg-white/[0.04] ${currentTrackId === t.id ? 'bg-gradient-to-r from-white/[0.03] to-white/[0.01] border-l-[3px] border-[#c8c8c8]' : ''} ${dragOverIdx === idx ? 'bg-white/[0.03]' : ''} ${draggingIdx === idx ? 'opacity-60' : ''}`} 
             tabIndex={0} 
             role="button"
           >

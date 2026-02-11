@@ -271,6 +271,22 @@ export default function App() {
     })
   }
 
+  const reorderPlaylist = (fromIndex, toIndex) => {
+    setPlaylist(prev => {
+      if (!Array.isArray(prev)) return prev
+      const len = prev.length
+      if (fromIndex < 0 || fromIndex >= len || toIndex < 0 || toIndex >= len) {
+        // allow dropping at end position (toIndex === len) by clamping
+        const clampedTo = Math.max(0, Math.min(toIndex, len - 1))
+        toIndex = clampedTo
+      }
+      const copy = prev.slice()
+      const [item] = copy.splice(fromIndex, 1)
+      copy.splice(toIndex, 0, item)
+      return copy
+    })
+  }
+
   const onNext = () => {
     const idx = playlist.findIndex(p => p.id === currentTrack.id)
     if (idx >= 0 && idx < playlist.length - 1) setCurrentTrack(playlist[idx + 1])
@@ -307,7 +323,7 @@ export default function App() {
         {route === '/connect' && <Connect /> }
       </main>
       <Player track={currentTrack || { src: '', artwork: '/logo/logoSVG.svg', title: '', artist: '' }} onNext={onNext} onPrev={onPrev} onEnded={onNext} />
-      <Playlist tracks={playlist} onSelect={playTrack} onAdd={addToPlaylist} onPlayPlaylist={playPlaylist} onShuffle={shufflePlaylist} onClear={clearPlaylist} onRemove={removeFromPlaylist} currentTrackId={currentTrack?.id} currentTrack={currentTrack} />
+      <Playlist tracks={playlist} onSelect={playTrack} onAdd={addToPlaylist} onPlayPlaylist={playPlaylist} onShuffle={shufflePlaylist} onClear={clearPlaylist} onRemove={removeFromPlaylist} onReorder={reorderPlaylist} currentTrackId={currentTrack?.id} currentTrack={currentTrack} />
     </>
   )
 }

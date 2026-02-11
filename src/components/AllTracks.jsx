@@ -47,7 +47,10 @@ export default function AllTracks({ allTracks = [], onPlay, onAdd, currentTrackI
       aria-label="All tracks"
     >
       <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? 'px-4' : ''}`}>All Tracks</h2>
-      <ul className={`list-none p-0 mt-3 custom-scrollbar flex-1 overflow-x-hidden ${isMobile ? 'overflow-y-auto px-4 pb-24' : 'max-h-[36rem] overflow-y-auto'}`}>
+      <ul
+        className={`list-none p-0 mt-3 custom-scrollbar flex-1 overflow-x-hidden ${isMobile ? 'overflow-y-auto px-4 pb-24' : 'max-h-[36rem] overflow-y-auto'}`}
+        style={{ paddingBottom: isMobile ? undefined : '6rem' }}
+      >
         {items.map((it, i) => {
           const isThisPlaying = currentTrackId === it.id && !audioState.paused
           return (

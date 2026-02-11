@@ -82,11 +82,11 @@ export default function Nav() {
       <div aria-hidden="true" className="absolute inset-x-0" style={{ top: '-1.25rem', zIndex: 1103, pointerEvents: 'none' }}>
         <div className="w-full overflow-hidden">
           <style>{`
-            @keyframes nobzMarquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
-            .nobz-marquee-inner{display:inline-block;padding-left:100%;white-space:nowrap;animation:nobzMarquee 24s linear infinite}
+            @keyframes nobzMarquee{0%{transform:translate3d(100%,0,0)}100%{transform:translate3d(-100%,0,0)}}
+            .nobz-marquee-inner{display:inline-block;padding-left:100%;white-space:nowrap;animation:nobzMarquee 24s linear infinite;will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0)}
           `}</style>
           <div className="nobz-marquee-inner text-center text-white/80 text-sm md:text-base font-cutive font-medium" style={{ pointerEvents: 'none' }}>
-          Drag or scroll to browse tracks and albums. Click on a track cover to start/pause playback. Click the vinyl to stop the track.
+          Drag or scroll to browse tracks and albums. Click on a track cover to start/pause playback. Click the vinyl to stop the track. Click on the arrow on the right to open the playlist.
           </div>
         </div>
       </div>

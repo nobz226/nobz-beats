@@ -258,6 +258,19 @@ export default function App() {
 
   const clearPlaylist = () => setPlaylist([])
 
+  const removeFromPlaylist = (id) => {
+    setPlaylist(prev => {
+      const idx = prev.findIndex(p => p.id === id)
+      const newList = prev.filter(p => p.id !== id)
+      // if the current track was removed, advance to the next item (or clear)
+      if (currentTrack && currentTrack.id === id) {
+        const next = newList[idx] || null
+        setCurrentTrack(next)
+      }
+      return newList
+    })
+  }
+
   const onNext = () => {
     const idx = playlist.findIndex(p => p.id === currentTrack.id)
     if (idx >= 0 && idx < playlist.length - 1) setCurrentTrack(playlist[idx + 1])
@@ -294,7 +307,7 @@ export default function App() {
         {route === '/connect' && <Connect /> }
       </main>
       <Player track={currentTrack || { src: '', artwork: '/logo/logoSVG.svg', title: '', artist: '' }} onNext={onNext} onPrev={onPrev} onEnded={onNext} />
-      <Playlist tracks={playlist} onSelect={playTrack} onAdd={addToPlaylist} onPlayPlaylist={playPlaylist} onShuffle={shufflePlaylist} onClear={clearPlaylist} currentTrackId={currentTrack?.id} currentTrack={currentTrack} />
+      <Playlist tracks={playlist} onSelect={playTrack} onAdd={addToPlaylist} onPlayPlaylist={playPlaylist} onShuffle={shufflePlaylist} onClear={clearPlaylist} onRemove={removeFromPlaylist} currentTrackId={currentTrack?.id} currentTrack={currentTrack} />
     </>
   )
 }

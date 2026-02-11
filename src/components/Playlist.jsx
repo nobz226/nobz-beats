@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { playVinyl, pauseVinyl } from '../lib/vinyl'
 
-export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, currentTrackId, currentTrack }) {
+export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist, onShuffle, onClear, onRemove, currentTrackId, currentTrack }) {
   // tracks passed from app state (playlist)
   const [durations, setDurations] = useState({})
   // load durations for playlist tracks
@@ -289,37 +289,51 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
                 {(() => {
                   const isThisPlaying = currentTrackId === t.id && !audioState.paused
                   return (
-                    <button
-                      className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]"
-                      aria-label={isThisPlaying ? 'Pause' : 'Play'}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        const audio = document.querySelector('.audio-player audio')
-                        if (!audio) {
-                          if (onSelect) onSelect(t)
-                          return
-                        }
-                        const a = audio.src || ''
-                        const s = t.src || ''
-                        const isMatch = s && (a.endsWith(s) || a.includes(s))
-                        if (isMatch) {
-                          if (!audio.paused) {
-                            audio.pause()
-                            try {
-                              pauseVinyl(String(t.id || t._id), t.albumId)
-                            } catch (e) {}
-                          } else {
-                            audio.play().catch(() => {})
-                            try {
-                              playVinyl(String(t.id || t._id), t.albumId)
-                            } catch (e) {}
+                    <>
+                      <button
+                        className="bg-transparent border-none text-white cursor-pointer text-xl p-1.5 rounded-md hover:bg-white/[0.04]"
+                        aria-label={isThisPlaying ? 'Pause' : 'Play'}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const audio = document.querySelector('.audio-player audio')
+                          if (!audio) {
+                            if (onSelect) onSelect(t)
+                            return
                           }
-                          return
-                        }
-                        if (onSelect) onSelect(t)
-                        setTimeout(() => { try { audio.play().catch(() => {}) } catch (e) {} }, 50)
-                      }}
-                    >{isThisPlaying ? '⏸' : '▶'}</button>
+                          const a = audio.src || ''
+                          const s = t.src || ''
+                          const isMatch = s && (a.endsWith(s) || a.includes(s))
+                          if (isMatch) {
+                            if (!audio.paused) {
+                              audio.pause()
+                              try {
+                                pauseVinyl(String(t.id || t._id), t.albumId)
+                              } catch (e) {}
+                            } else {
+                              audio.play().catch(() => {})
+                              try {
+                                playVinyl(String(t.id || t._id), t.albumId)
+                              } catch (e) {}
+                            }
+                            return
+                          }
+                          if (onSelect) onSelect(t)
+                          setTimeout(() => { try { audio.play().catch(() => {}) } catch (e) {} }, 50)
+                        }}
+                      >{isThisPlaying ? '⏸' : '▶'}</button>
+
+                      <button
+                        className="bg-transparent border-none text-white cursor-pointer text-xl font-semibold p-1.5 rounded-md hover:bg-white/[0.04]"
+                        aria-label="Remove from playlist"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          try {
+                            if (!confirm('Remove this track from the playlist?')) return
+                            if (onRemove) onRemove(t.id)
+                          } catch (err) { console.error('Failed to remove from playlist', err) }
+                        }}
+                      >−</button>
+                    </>
                   )
                 })()}
               </div>

@@ -89,7 +89,7 @@ export const uploadArtwork = httpAction(async ({ storage }, request) => {
       storageId = await storage.store(blob)
     }
     const url = typeof storage.getUrl === 'function' ? await storage.getUrl(storageId) : null
-    return jsonResponse({ url }, 200)
+    return jsonResponse({ url, storageId }, 200)
   } catch (err) {
     console.error('[uploadArtwork] unexpected error', err)
     return jsonResponse({ error: 'internal server error' }, 500)
@@ -120,7 +120,7 @@ export const uploadAudio = httpAction(async ({ storage }, request) => {
       storageId = await storage.store(blob)
     }
     const url = typeof storage.getUrl === 'function' ? await storage.getUrl(storageId) : null
-    return jsonResponse({ url }, 200)
+    return jsonResponse({ url, storageId }, 200)
   } catch (err) {
     console.error('[uploadAudio] unexpected error', err)
     return jsonResponse({ error: 'internal server error' }, 500)

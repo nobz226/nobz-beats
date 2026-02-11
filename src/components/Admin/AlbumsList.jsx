@@ -47,12 +47,15 @@ export default function AlbumsList() {
     if (!editing) return
     try {
       let artworkUrl = editing.artwork || ''
+      let artworkStorageId = editing.artworkStorageId
       if (editing.artFile) {
-        artworkUrl = await uploadToStorage(editing.artFile)
+        const res = await uploadToStorage(editing.artFile)
+        artworkUrl = res.url
+        artworkStorageId = res.storageId
       }
 
-      // update album doc
-      await updateAlbum({ id: editing.id, patch: { title: editing.title, description: editing.description, artwork: artworkUrl } })
+      // update album doc (include artworkStorageId for cleanup)
+      await updateAlbum({ id: editing.id, patch: { title: editing.title, description: editing.description, artwork: artworkUrl, artworkStorageId } })
 
       // compute track membership changes
       const originalMembers = new Set(allTracks.filter(t => (t.albumId === editing.id)).map(t => String(t._id || t.id)))

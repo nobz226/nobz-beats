@@ -30,5 +30,5 @@ export async function uploadToStorage(file) {
   try { json = await res.json() } catch (e) { throw new Error('Upload failed: invalid JSON response') }
   if (!res.ok) throw new Error(json?.error || `Upload failed: ${res.status}`)
   if (!json.url) throw new Error('Upload succeeded but no url returned')
-  return json.url
+  return { url: json.url, storageId: json.storageId }
 }

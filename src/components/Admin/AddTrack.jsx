@@ -23,16 +23,22 @@ export default function AddTrack() {
     setUploading(true)
     try {
       let artworkUrl = '/artwork/default.png'
+      let artworkStorageId = undefined
       if (artFile) {
-        artworkUrl = await uploadToStorage(artFile)
+        const res = await uploadToStorage(artFile)
+        artworkUrl = res.url
+        artworkStorageId = res.storageId
       } else if (type === 'album' && albumId) {
         const alb = albums.find(a => (a._id || a.id) === albumId)
         if (alb && alb.artwork) artworkUrl = alb.artwork
       }
 
       let audioUrl = ''
+      let audioStorageId = undefined
       if (audioFile) {
-        audioUrl = await uploadToStorage(audioFile)
+        const res = await uploadToStorage(audioFile)
+        audioUrl = res.url
+        audioStorageId = res.storageId
       } else {
         throw new Error('Audio file is required')
       }
@@ -41,7 +47,9 @@ export default function AddTrack() {
         title, 
         description, 
         artwork: artworkUrl, 
+        artworkStorageId,
         src: audioUrl, 
+        srcStorageId: audioStorageId,
         type, 
         createdAt: Date.now() 
       }

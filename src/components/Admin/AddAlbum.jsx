@@ -18,10 +18,13 @@ export default function AddAlbum() {
     setUploading(true)
     try {
       let artwork = '/artwork/default.png'
+      let artworkStorageId = undefined
       if (artFile) {
-        artwork = await uploadToStorage(artFile)
+        const res = await uploadToStorage(artFile)
+        artwork = res.url
+        artworkStorageId = res.storageId
       }
-      const payload = { title, description, artwork, createdAt: Date.now() }
+      const payload = { title, description, artwork, artworkStorageId, createdAt: Date.now() }
       await createAlbum(payload)
       alert('Album created')
       setTitle(''); setDescription(''); setArtFile(null)

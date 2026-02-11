@@ -79,6 +79,17 @@ export default function Nav() {
 
   return (
     <nav ref={navRef} className="site-nav fixed top-4 lg:top-[4.6875rem] right-2 lg:right-2 w-full lg:w-auto flex flex-col lg:flex-row items-end lg:items-center gap-4 z-[1002]" aria-label="Primary navigation">
+      <div aria-hidden="true" className="absolute inset-x-0" style={{ top: '-1.25rem', zIndex: 1103, pointerEvents: 'none' }}>
+        <div className="w-full overflow-hidden">
+          <style>{`
+            @keyframes nobzMarquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+            .nobz-marquee-inner{display:inline-block;padding-left:100%;white-space:nowrap;animation:nobzMarquee 24s linear infinite}
+          `}</style>
+          <div className="nobz-marquee-inner text-center text-white/80 text-sm md:text-base font-cutive font-medium" style={{ pointerEvents: 'none' }}>
+          Drag or scroll to browse tracks and albums. Click on a track cover to start/pause playback. Click the vinyl to stop the track.
+          </div>
+        </div>
+      </div>
       <button
         className="lg:hidden relative z-[1102] text-[1.625rem] p-2 cursor-pointer rounded-lg border-none text-white bg-white/[0.03] hover:bg-white/[0.08]"
         aria-label={open ? 'Close menu' : 'Open menu'}

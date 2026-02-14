@@ -219,8 +219,24 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
           <div className="flex flex-col overflow-hidden w-full">
             <div className="font-cal-sans font-semibold text-white text-xs md:text-sm truncate">{track.title}</div>
 
+            {/* Mobile-only thinner progress bar placed between title and transport buttons */}
+            <div className="flex items-center gap-2 w-full mt-2 md:hidden">
+              <span className="font-cutive text-[10px] text-white/90 min-w-[2.5rem]">{formatTime(currentTime)}</span>
+              <input
+                aria-label="Seek"
+                type="range"
+                min="0"
+                max={duration || 0}
+                value={currentTime}
+                step="0.01"
+                onChange={onSeek}
+                className="flex-1 h-1 accent-red-500"
+              />
+              <span className="font-cutive text-[10px] text-white/90 min-w-[2.5rem]">{formatTime(duration)}</span>
+            </div>
+
             <div className="flex items-center gap-3 w-full mt-1 md:mt-0">
-              <div className="flex items-center gap-2 flex-none">
+              <div className="-ml-1 md:ml-0 flex items-center gap-4 md:gap-2 flex-none">
                 <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Previous" onClick={handlePrev}><ion-icon name="play-skip-back" className="text-xl text-white"></ion-icon></button>
                 <button className="bg-transparent border-none text-white cursor-pointer text-2xl p-1 rounded-md hover:bg-white/[0.04]" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
                   {playing ? <ion-icon name="pause" className="text-2xl text-white"></ion-icon> : <ion-icon name="play" className="text-2xl text-white"></ion-icon>}
@@ -228,7 +244,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
                 <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Next" onClick={handleNext}><ion-icon name="play-skip-forward" className="text-xl text-white"></ion-icon></button>
               </div>
 
-              <div className="flex items-center gap-2 flex-auto min-w-0 max-w-full">
+              <div className="hidden md:flex items-center gap-2 flex-auto min-w-0 max-w-full">
                 <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(currentTime)}</span>
                 <input
                   aria-label="Seek"
@@ -243,7 +259,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
                 <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(duration)}</span>
               </div>
 
-              <div className="hidden md:flex items-center gap-2">
+              <div className="ml-11 md:ml-0 flex items-center gap-2">
                 <ion-icon name="volume-high" className="text-white text-base"></ion-icon>
 
                 <svg
@@ -254,7 +270,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
                   aria-valuemax={1}
                   aria-valuenow={Number(volume.toFixed(2))}
                   tabIndex={0}
-                  className="w-28 h-5 cursor-pointer"
+                  className="w-20 h-5 md:w-28 cursor-pointer"
                   viewBox="0 0 100 20"
                   preserveAspectRatio="none"
                   onPointerDown={(e) => {
@@ -284,10 +300,6 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
                   }}
                 >
                   <defs>
-                    <linearGradient id={gradIdRef.current} x1="0%" x2="100%">
-                      <stop offset="0%" stopColor="#e11d48" />
-                      <stop offset="100%" stopColor="#f87171" />
-                    </linearGradient>
                     <clipPath id={clipIdRef.current}>
                       <rect x="0" y="0" width={`${Math.max(0, Math.min(1, volume)) * 100}`} height="20" />
                     </clipPath>
@@ -298,7 +310,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
                   {/* filled triangle masked by rect clip */}
                   <g clipPath={`url(#${clipIdRef.current})`}>
-                    <polygon points="0,10 100,0 100,20" fill={`url(#${gradIdRef.current})`} />
+                    <polygon points="0,10 100,0 100,20" fill="#ef4444" />
                   </g>
                 </svg>
 

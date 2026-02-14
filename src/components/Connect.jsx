@@ -15,7 +15,7 @@ export default function Connect() {
       style={{
         left: isMobile ? '0' : 'var(--main-left)',
         top: isMobile ? 'var(--main-top)' : 'calc(var(--main-top) - 1rem)',
-        bottom: isMobile ? '8rem' : 'auto',
+        bottom: isMobile ? 'var(--player-bottom)' : 'auto',
         width: isMobile ? '100%' : 'auto',
         maxWidth: isMobile ? 'none' : 'var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))',
         animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)'

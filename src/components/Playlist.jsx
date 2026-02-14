@@ -153,7 +153,7 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
     return () => { window.removeEventListener('resize', updatePos); mo.disconnect() }
   }, [])
 
-  const [expanded, setExpanded] = useState(false)
+  
   // Desktop visibility (persisted). Default to hidden on first load.
   const [visible, setVisible] = useState(() => {
     try {
@@ -172,6 +172,7 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
   }
 
   const toggleRef = React.useRef(null)
+  const mobileToggleRef = React.useRef(null)
   const [highlight, setHighlight] = useState(false)
   const prevLenRef = useRef((tracks && tracks.length) || 0)
   const [draggingIdx, setDraggingIdx] = useState(null)
@@ -189,32 +190,77 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
     prevLenRef.current = cur
   }, [tracks && tracks.length, visible])
 
-  // Clear highlight when playlist is shown/expanded by the user
+  // Clear highlight when playlist is shown by the user
   useEffect(() => {
-    if (visible || expanded) setHighlight(false)
-  }, [visible, expanded])
+    if (visible) setHighlight(false)
+  }, [visible])
 
-  // Position the desktop toggle so it sits half-over the playlist's left edge
+  // Position the toggle buttons so they sit half-over the playlist's left edge
+  // when the playlist is visible. Desktop (`toggleRef`) and mobile (`mobileToggleRef`)
+  // are positioned separately because each is only shown on its respective viewport.
   React.useEffect(() => {
-    const btn = toggleRef.current
+    const desktopBtn = toggleRef.current
+    const mobileBtn = mobileToggleRef.current
     const el = ref.current
-    if (!btn) return
+    // If neither button exists, nothing to do
+    if (!desktopBtn && !mobileBtn) return
 
     const update = () => {
       try {
-        // If playlist hidden, keep button at right edge
-        if (!visible) {
-          btn.style.left = ''
-          btn.style.right = '0.5rem'
-          return
+        const doPosition = (btn) => {
+          if (!btn) return
+          // If playlist hidden, keep button at right edge
+          if (!visible) {
+            btn.style.left = ''
+            btn.style.right = '0.5rem'
+            return
+          }
+          if (!el) return
+          const rect = el.getBoundingClientRect()
+          const btnW = btn.offsetWidth || 36
+          const left = Math.max(8, Math.round(rect.left - btnW / 2))
+          btn.style.left = left + 'px'
+          btn.style.right = 'auto'
         }
-        if (!el) return
-        const rect = el.getBoundingClientRect()
-        const btnW = btn.offsetWidth || 36
-        const left = Math.max(8, Math.round(rect.left - btnW / 2))
-        btn.style.left = left + 'px'
-        // override class `right-2` by setting inline right to auto
-        btn.style.right = 'auto'
+
+        // Desktop: only position when desktop button exists
+        if (desktopBtn) doPosition(desktopBtn)
+
+        // Mobile: position centered on the top border of the playlist when visible
+        if (mobileBtn) {
+          if (window.innerWidth <= 1120) {
+            if (!visible) {
+              mobileBtn.style.left = ''
+              mobileBtn.style.top = ''
+              mobileBtn.style.right = '0.5rem'
+              mobileBtn.style.transform = ''
+            } else if (el) {
+              const rect = el.getBoundingClientRect()
+              const btnW = mobileBtn.offsetWidth || 36
+              const btnH = mobileBtn.offsetHeight || 36
+              const centerX = rect.left + rect.width / 2
+              const left = Math.round(centerX - btnW / 2)
+              const top = Math.round(rect.top - btnH / 2)
+              mobileBtn.style.left = left + 'px'
+              mobileBtn.style.top = top + 'px'
+              mobileBtn.style.right = 'auto'
+              // remove vertical translate so top positioning is exact
+              mobileBtn.style.transform = 'none'
+            } else {
+              // fallback to default right edge
+              mobileBtn.style.left = ''
+              mobileBtn.style.right = '0.5rem'
+              mobileBtn.style.top = ''
+              mobileBtn.style.transform = ''
+            }
+          } else {
+            // on larger screens keep mobile button at right
+            mobileBtn.style.left = ''
+            mobileBtn.style.top = ''
+            mobileBtn.style.right = '0.5rem'
+            mobileBtn.style.transform = ''
+          }
+        }
       } catch (e) {
         // ignore
       }
@@ -239,20 +285,26 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
       }
       mo.disconnect()
     }
-  }, [visible, expanded])
+  }, [visible])
 
   return (
     <>
-      <button 
-        className="lg:hidden fixed bottom-24 right-4 z-[1010] bg-white/[0.05] border border-white/[0.1] text-white p-3 rounded-full backdrop-blur-md shadow-lg"
-        onClick={() => setExpanded(!expanded)}
-        aria-label="Toggle Playlist"
+      <button
+        ref={mobileToggleRef}
+        title={visible ? 'Hide playlist' : 'Show playlist'}
+        aria-label={visible ? 'Hide playlist' : 'Show playlist'}
+        onClick={toggleVisible}
+        className={`flex lg:hidden fixed right-2 top-1/2 z-[1011] -translate-y-1/2 items-center justify-center bg-white/5 text-white rounded-md border border-white/[0.06] hover:bg-white/10 transition-all px-3 py-2 ${highlight ? 'ring-4 ring-white/30 pulse-highlight' : ''}`}
       >
-        {expanded ? <ion-icon name="close-outline" class="text-xl"></ion-icon> : <ion-icon name="musical-notes-outline" class="text-xl"></ion-icon>}
+        {visible ? (
+          <span className="inline-block leading-[1.05] text-[0.9rem] font-bold font-cal-sans">Hide</span>
+        ) : (
+          <span className="inline-block [writing-mode:vertical-rl] [text-orientation:mixed] leading-[1.05] text-[0.9rem] font-bold font-cal-sans">Playlist</span>
+        )}
       </button>
       <aside 
         ref={ref} 
-        className={`playlist fixed right-4 lg:right-auto lg:left-auto top-[4.6875rem] w-[calc(100vw-2rem)] md:max-w-[22.5rem] h-auto max-h-[calc(100vh-12rem)] md:max-h-[calc(100vh-7.5rem)] overflow-y-auto overflow-x-hidden custom-scrollbar z-[1010] text-white p-3 rounded-lg bg-[#1c1c1c]/95 lg:bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] lg:border-none shadow-2xl lg:shadow-none transition-all duration-500 ease-[cubic-bezier(0.22,0.8,0.25,1)] ${expanded ? 'translate-x-0 opacity-100 pointer-events-auto' : (visible ? 'translate-x-[120%] opacity-0 pointer-events-none lg:translate-x-0 lg:opacity-100 lg:pointer-events-auto' : 'translate-x-[120%] opacity-0 pointer-events-none lg:translate-x-[120%] lg:opacity-0 lg:pointer-events-none')} font-cutive`}
+        className={`playlist fixed right-4 lg:right-auto lg:left-auto top-[4.6875rem] w-[calc(100vw-2rem)] md:max-w-[22.5rem] h-auto max-h-[calc(100vh-12rem)] md:max-h-[calc(100vh-7.5rem)] overflow-y-auto overflow-x-hidden custom-scrollbar z-[1010] text-white p-3 rounded-lg bg-[#1c1c1c]/95 lg:bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] lg:border-none shadow-2xl lg:shadow-none transition-all duration-500 ease-[cubic-bezier(0.22,0.8,0.25,1)] ${visible ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-[120%] opacity-0 pointer-events-none lg:translate-x-[120%] lg:opacity-0 lg:pointer-events-none'} font-cutive`}
         aria-label="Playlist"
       >
       

@@ -17,6 +17,7 @@
     --vinyl-protrude: calc(var(--vinyl-width) * 0.4);
     --main-left: calc(var(--logo-size) + var(--logo-gap) + 1.125rem);
     --main-top: 14.375rem;
+    --player-bottom: 8rem;
   }
 
   @media (max-width: 1024px) {
@@ -35,7 +36,8 @@
       --vinyl-width: 14rem;
       --vinyl-protrude: calc(var(--vinyl-width) * 0.4);
       --main-left: 1rem;
-      --main-top: 8rem;
+      --main-top: 6.5rem;
+      --player-bottom: 6rem;
     }
   }
 

@@ -9,6 +9,10 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(1)
+  const volRef = useRef(null)
+  const volPointerActive = useRef(false)
+  const clipIdRef = useRef(`vol-clip-${Math.random().toString(36).slice(2)}`)
+  const gradIdRef = useRef(`vol-grad-${Math.random().toString(36).slice(2)}`)
 
   useEffect(() => {
     const audio = audioRef.current
@@ -200,7 +204,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
   return (
     <div 
-      className="audio-player fixed left-15 bottom-0 z-[1003] bg-transparent flex items-center justify-center py-2.5 w-full lg:right-[3.50rem] h-auto lg:h-[4.5rem]" 
+      className="audio-player fixed left-0 right-0 bottom-0 z-[1003] bg-transparent flex items-center justify-center py-2.5 w-full lg:right-[3.50rem] h-auto lg:h-[4.5rem]" 
       role="region" 
       aria-label="Audio player"
     >
@@ -241,15 +245,73 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
               <div className="hidden md:flex items-center gap-2">
                 <ion-icon name="volume-high" className="text-white text-base"></ion-icon>
-                <input
+
+                <svg
+                  ref={volRef}
+                  role="slider"
                   aria-label="Volume"
+                  aria-valuemin={0}
+                  aria-valuemax={1}
+                  aria-valuenow={Number(volume.toFixed(2))}
+                  tabIndex={0}
+                  className="w-28 h-5 cursor-pointer"
+                  viewBox="0 0 100 20"
+                  preserveAspectRatio="none"
+                  onPointerDown={(e) => {
+                    volPointerActive.current = true
+                    try { volRef.current.setPointerCapture(e.pointerId) } catch (err) {}
+                    const rect = volRef.current.getBoundingClientRect()
+                    const x = e.clientX - rect.left
+                    const pct = Math.max(0, Math.min(1, x / rect.width))
+                    setVolume(pct)
+                  }}
+                  onPointerMove={(e) => {
+                    if (!volPointerActive.current) return
+                    const rect = volRef.current.getBoundingClientRect()
+                    const x = e.clientX - rect.left
+                    const pct = Math.max(0, Math.min(1, x / rect.width))
+                    setVolume(pct)
+                  }}
+                  onPointerUp={(e) => {
+                    volPointerActive.current = false
+                    try { volRef.current.releasePointerCapture(e.pointerId) } catch (err) {}
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') setVolume(v => Math.max(0, +(v - 0.05).toFixed(2)))
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') setVolume(v => Math.min(1, +(v + 0.05).toFixed(2)))
+                    if (e.key === 'Home') setVolume(0)
+                    if (e.key === 'End') setVolume(1)
+                  }}
+                >
+                  <defs>
+                    <linearGradient id={gradIdRef.current} x1="0%" x2="100%">
+                      <stop offset="0%" stopColor="#e11d48" />
+                      <stop offset="100%" stopColor="#f87171" />
+                    </linearGradient>
+                    <clipPath id={clipIdRef.current}>
+                      <rect x="0" y="0" width={`${Math.max(0, Math.min(1, volume)) * 100}`} height="20" />
+                    </clipPath>
+                  </defs>
+
+                  {/* outline triangle */}
+                  <polygon points="0,10 100,0 100,20" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+
+                  {/* filled triangle masked by rect clip */}
+                  <g clipPath={`url(#${clipIdRef.current})`}>
+                    <polygon points="0,10 100,0 100,20" fill={`url(#${gradIdRef.current})`} />
+                  </g>
+                </svg>
+
+                {/* visually-hidden native input for accessibility & form behavior */}
+                <input
+                  className="sr-only"
+                  aria-hidden="true"
                   type="range"
                   min="0"
                   max="1"
                   step="0.01"
                   value={volume}
                   onChange={(e) => setVolume(Number(e.target.value))}
-                  className="w-16 accent-red-500"
                 />
               </div>
             </div>

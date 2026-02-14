@@ -210,51 +210,49 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
         className="w-[calc(100%-2rem)] max-w-[48rem] flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 py-3 md:py-2 px-3.5 rounded-xl md:rounded-[0.625rem] pointer-events-auto opacity-0 bg-[#1c1c1c]/95 shadow-[0_0.375rem_1.125rem_rgba(0,0,0,0.5)] border border-white/5 translate-y-3 animate-player-drop"
         style={{ animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s + var(--title-fade) + var(--player-gap))' }}
       >
-        <div className="flex items-center gap-3 w-full md:min-w-[11.25rem] md:w-auto">
+        <div className="flex items-center gap-3 w-full md:min-w-[11.25rem] md:flex-1">
           <img src={track.artwork} alt="Artwork" className="w-12 h-12 md:w-14 md:h-14 object-cover rounded-md" />
-          <div className="flex flex-col overflow-hidden">
+          <div className="flex flex-col overflow-hidden w-full">
             <div className="font-cal-sans font-semibold text-white text-xs md:text-sm truncate">{track.title}</div>
-            <div className="font-cutive font-normal text-white/90 text-[10px] md:text-xs truncate">{track.artist}</div>
-          </div>
-        </div>
 
-        <div className="flex flex-col md:flex-row items-center w-full md:w-auto gap-2 md:gap-4 flex-1">
-          <div className="flex gap-4 items-center justify-center">
-            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Previous" onClick={handlePrev}><ion-icon name="play-skip-back" className="text-xl text-white"></ion-icon></button>
-            <button className="bg-transparent border-none text-white cursor-pointer text-2xl p-1 rounded-md hover:bg-white/[0.04]" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
-              {playing ? <ion-icon name="pause" className="text-2xl text-white"></ion-icon> : <ion-icon name="play" className="text-2xl text-white"></ion-icon>}
-            </button>
-            <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Next" onClick={handleNext}><ion-icon name="play-skip-forward" className="text-xl text-white"></ion-icon></button>
-          </div>
-          <div className="flex items-center gap-2 w-full max-w-md">
-            <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(currentTime)}</span>
-            <input
-              aria-label="Seek"
-              type="range"
-              min="0"
-              max={duration || 0}
-              value={currentTime}
-              step="0.01"
-              onChange={onSeek}
-              className="flex-1 accent-red-500"
-            />
-            <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(duration)}</span>
-          </div>
-        </div>
+            <div className="flex items-center gap-3 w-full mt-1 md:mt-0">
+              <div className="flex items-center gap-2 flex-none">
+                <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Previous" onClick={handlePrev}><ion-icon name="play-skip-back" className="text-xl text-white"></ion-icon></button>
+                <button className="bg-transparent border-none text-white cursor-pointer text-2xl p-1 rounded-md hover:bg-white/[0.04]" onClick={togglePlay} aria-label={playing ? 'Pause' : 'Play'}>
+                  {playing ? <ion-icon name="pause" className="text-2xl text-white"></ion-icon> : <ion-icon name="play" className="text-2xl text-white"></ion-icon>}
+                </button>
+                <button className="bg-transparent border-none text-white cursor-pointer text-xl p-1 rounded-md hover:bg-white/[0.04]" aria-label="Next" onClick={handleNext}><ion-icon name="play-skip-forward" className="text-xl text-white"></ion-icon></button>
+              </div>
 
-        <div className="hidden md:flex items-center gap-2 min-w-20 justify-end">
-          <div className="flex items-center gap-2">
-            <ion-icon name="volume-high" className="text-white text-base"></ion-icon>
-            <input
-              aria-label="Volume"
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={(e) => setVolume(Number(e.target.value))}
-              className="w-20 accent-red-500"
-            />
+              <div className="flex items-center gap-2 flex-auto min-w-0 max-w-full">
+                <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(currentTime)}</span>
+                <input
+                  aria-label="Seek"
+                  type="range"
+                  min="0"
+                  max={duration || 0}
+                  value={currentTime}
+                  step="0.01"
+                  onChange={onSeek}
+                  className="flex-auto w-full accent-red-500"
+                />
+                <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(duration)}</span>
+              </div>
+
+              <div className="hidden md:flex items-center gap-2">
+                <ion-icon name="volume-high" className="text-white text-base"></ion-icon>
+                <input
+                  aria-label="Volume"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => setVolume(Number(e.target.value))}
+                  className="w-16 accent-red-500"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

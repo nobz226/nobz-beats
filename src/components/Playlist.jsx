@@ -372,9 +372,11 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
         aria-label={visible ? 'Hide playlist' : 'Show playlist'}
         onClick={toggleVisible}
         ref={toggleRef}
-        className={`hidden lg:flex fixed right-2 top-1/2 z-[1011] -translate-y-1/2 items-center justify-center w-9 h-9 bg-white/5 text-white rounded-full border border-white/[0.06] hover:bg-white/10 transition-all ${highlight ? 'ring-4 ring-white/30 pulse-highlight' : ''}`}
+          className={`hidden lg:flex fixed right-2 top-1/2 z-[1011] -translate-y-1/2 items-center justify-center bg-white/5 text-white rounded-md border border-white/[0.06] hover:bg-white/10 transition-all px-3 py-2 ${highlight ? 'ring-4 ring-white/30 pulse-highlight' : ''}`}
       >
-        {visible ? '▶' : '◀'}
+          <span className="inline-block [writing-mode:vertical-rl] [text-orientation:mixed] leading-[1.05] text-[0.9rem] font-bold font-cal-sans">
+            {visible ? 'Hide' : 'Playlist'}
+          </span>
       </button>
     </>
   )

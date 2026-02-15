@@ -13,6 +13,54 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
   const volPointerActive = useRef(false)
   const clipIdRef = useRef(`vol-clip-${Math.random().toString(36).slice(2)}`)
   const gradIdRef = useRef(`vol-grad-${Math.random().toString(36).slice(2)}`)
+  const vizRef = useRef(null)
+  const [barCount, setBarCount] = useState(8)
+  const vizParamsRef = useRef([])
+
+  useEffect(() => {
+    const compute = (w) => {
+      const unit = 6 // 5px bar + 1px gap
+      if (!w || w <= 0) {
+        // ensure some defaults
+        vizParamsRef.current = vizParamsRef.current.length ? vizParamsRef.current : []
+        return setBarCount(8)
+      }
+      const count = Math.max(4, Math.floor((w + 1) / unit))
+      // regenerate params only when count changes
+      if (!vizParamsRef.current || vizParamsRef.current.length !== count) {
+        const params = Array.from({ length: count }).map(() => {
+          const peak = +(0.35 + Math.random() * 0.65).toFixed(3) // max scale
+          const min = +(0.08 + Math.random() * 0.22).toFixed(3) // min scale
+          const duration = Math.round(600 + Math.random() * 900) // 600-1500ms
+          const delay = Math.round(-Math.random() * duration) // negative start
+          const timings = ['cubic-bezier(.2,.8,.3,1)', 'ease-in-out', 'cubic-bezier(.3,.7,.4,1)']
+          const timing = timings[Math.floor(Math.random() * timings.length)]
+          return { peak, min, duration: `${duration}ms`, delay: `${delay}ms`, timing }
+        })
+        vizParamsRef.current = params
+      }
+      setBarCount(count)
+    }
+
+    const el = vizRef.current
+    if (!el) return
+
+    compute(el.clientWidth)
+
+    let ro
+    try {
+      ro = new ResizeObserver((entries) => {
+        for (const entry of entries) compute(entry.contentRect.width)
+      })
+      ro.observe(el)
+    } catch (e) {
+      const handler = () => compute(el.clientWidth)
+      window.addEventListener('resize', handler)
+      return () => window.removeEventListener('resize', handler)
+    }
+
+    return () => { try { ro && ro.disconnect() } catch (e) {} }
+  }, [track])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -246,6 +294,33 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
 
               <div className="hidden md:flex items-center gap-2 flex-auto min-w-0 max-w-full">
                 <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(currentTime)}</span>
+
+                {/* Desktop visualizer placed above the desktop progress input. Visible only when a track src exists. */}
+                {track && track.src ? (
+                  <div className={"desktop-visualizer flex flex-col items-center justify-center mx-3" + (playing ? ' playing' : ' paused')} aria-hidden="true">
+                    <div className="viz-bars inline-flex items-end" role="img" aria-hidden="true" ref={vizRef}>
+                      {Array.from({ length: barCount }).map((_, i) => {
+                        const p = (vizParamsRef.current && vizParamsRef.current[i]) || {}
+                        return (
+                          <div
+                            key={i}
+                            className={`viz-bar`}
+                            style={{
+                              ['--viz-max']: p.peak,
+                              ['--viz-min']: p.min,
+                              animationDelay: p.delay,
+                              animationDuration: p.duration,
+                              animationTimingFunction: p.timing,
+                            }}
+                          />
+                        )
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="desktop-visualizer-hidden" />
+                )}
+
                 <input
                   aria-label="Seek"
                   type="range"
@@ -256,6 +331,7 @@ export default function Player({ track, onNext, onPrev, onEnded }) {
                   onChange={onSeek}
                   className="flex-auto w-full accent-red-500"
                 />
+
                 <span className="font-cutive text-[10px] md:text-xs text-white/90 min-w-[2.5rem]">{formatTime(duration)}</span>
               </div>
 

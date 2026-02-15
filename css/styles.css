@@ -81,13 +81,50 @@
     background: rgba(255, 255, 255, 0.2);
   }
 
+  /* Mobile-specific adjustments: ensure track visible and thumb hidden on small screens */
+  @media (max-width: 767px) {
+    @layer utilities {
+      .audio-player input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 6px;
+        background: transparent;
+      }
+
+      .audio-player input[type="range"]::-webkit-slider-runnable-track {
+        height: 6px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 999px;
+      }
+
+      .audio-player input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 0;
+        height: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        margin-top: -3px;
+      }
+
+      .audio-player input[type="range"]::-moz-range-thumb {
+        width: 0;
+        height: 0;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
-    *:before,
-    *:after {
-      animation: none !important;
-      transition: none !important;
-      scroll-behavior: auto !important;
+    *::before,
+    *::after {
+      animation: none;
+      transition: none;
+      scroll-behavior: auto;
     }
   }
 }
@@ -184,4 +221,229 @@
 
 .pulse-highlight {
   animation: pulse-highlight 1.4s ease-out infinite;
+}
+
+/* Show a visible track but hide the native thumb inside the audio player */
+@layer utilities {
+  .audio-player input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: transparent;
+  }
+
+  /* WebKit / Blink */
+  .audio-player input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+  }
+  .audio-player input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    margin-top: -3px;
+  }
+
+  /* Firefox */
+  .audio-player input[type="range"]::-moz-range-track {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 999px;
+  }
+  .audio-player input[type="range"]::-moz-range-progress {
+    background: #ef4444; /* accent-red-500 */
+    height: 6px;
+    border-radius: 999px;
+  }
+  .audio-player input[type="range"]::-moz-range-thumb {
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+  }
+
+  /* IE/Edge */
+  .audio-player input[type="range"]::-ms-track {
+    height: 6px;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+  .audio-player input[type="range"]::-ms-fill-lower {
+    background: #ef4444;
+    height: 6px;
+    border-radius: 999px;
+  }
+  .audio-player input[type="range"]::-ms-fill-upper {
+    background: rgba(255,255,255,0.08);
+    height: 6px;
+    border-radius: 999px;
+  }
+  .audio-player input[type="range"]::-ms-thumb {
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+  }
+}
+
+/* Desktop-only audio visualizer (vertical bars). Shown above the desktop
+   progress input. Animation runs when playing, pauses when paused, and the
+   element is not rendered when a track is stopped. */
+@media (min-width: 768px) {
+  /* Make the desktop progress container positioned relative so the
+     absolutely-positioned visualizer can be aligned above the input
+     and centered between the time labels without affecting layout. */
+  html body .audio-player.fixed .hidden.md\:flex.items-center.gap-2.flex-auto.min-w-0.max-w-full {
+    position: relative;
+    overflow: visible; /* allow visualizer to render above */
+  }
+
+  .desktop-visualizer {
+    display: block;
+    position: absolute; /* remove from flow so it won't shrink the input */
+    left: 2.5rem; /* start after left time label */
+    right: 2.5rem; /* end before right time label */
+    top: calc(-1.1rem + 8px); /* moved 2px lower */
+    height: 1rem; /* keep no taller than the track title */
+    pointer-events: none;
+    z-index: 10;
+    align-items: end;
+  }
+
+  .desktop-visualizer-hidden {
+    display: none;
+  }
+
+  /* Nudge the desktop progress input down 2px so it aligns with the visualizer */
+  html body .audio-player.fixed .hidden.md\:flex.items-center.gap-2.flex-auto.min-w-0.max-w-full input[type="range"] {
+    transform: translateY(1px);
+  }
+
+  .viz-bars {
+    display: flex;
+    width: 100%;
+    gap: 1px;
+    align-items: end;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .viz-bar {
+    width: 5px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 2px;
+    transform-origin: bottom center;
+    animation: viz-scale 800ms cubic-bezier(.2,.8,.3,1) infinite;
+    /* start with small scale so bars are visible even before animation kicks in */
+    transform: scaleY(0.25);
+    height: 100%;
+  }
+
+  /* staggered animations for variety */
+  @keyframes viz-scale {
+    0% { transform: scaleY(var(--viz-min, 0.2)); }
+    50% { transform: scaleY(var(--viz-max, 1.0)); }
+    100% { transform: scaleY(var(--viz-min, 0.25)); }
+  }
+
+  /* set different durations/delays per bar using nth-child */
+  .viz-bar-0 { animation: viz-scale 820ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -60ms; }
+  .viz-bar-1 { animation: viz-scale 740ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -120ms; }
+  .viz-bar-2 { animation: viz-scale 900ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -30ms; }
+  .viz-bar-3 { animation: viz-scale 760ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -150ms; }
+  .viz-bar-4 { animation: viz-scale 820ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -90ms; }
+  .viz-bar-5 { animation: viz-scale 680ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -40ms; }
+  .viz-bar-6 { animation: viz-scale 860ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -110ms; }
+  .viz-bar-7 { animation: viz-scale 780ms cubic-bezier(.2,.8,.3,1) infinite; animation-delay: -20ms; }
+
+  /* Pause animations when the player is paused */
+  .desktop-visualizer.paused .viz-bar { animation-play-state: paused; }
+
+  /* When playing remove any opacity reduction */
+  .desktop-visualizer.playing .viz-bar { opacity: 1; }
+}
+
+/* Mobile-only: make audio player span full width and sit at the very bottom.
+   Use higher-specificity selectors (no `!important`) so utilities don't win.
+   These selectors only apply below the mobile breakpoint. */
+@media (max-width: 767px) {
+  html body .audio-player.fixed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    /* only account for the device safe-area inset so the player sits flush */
+    padding: 0 0 calc(env(safe-area-inset-bottom, 0px)) 0;
+    box-sizing: border-box;
+    z-index: 10050;
+  }
+
+  /* Inner container (tailwind classes) — force full width and remove rounded corners */
+  html body .audio-player.fixed > div {
+    width: 100%;
+    max-width: none;
+    padding: 0.25rem 0.5rem 0 0.5rem;
+    border-radius: 0;
+  }
+
+  /* If an inline style sets right on the element, ensure mobile right is 0 by
+     increasing specificity to beat inline styles when they come from attributes
+     generated by utility classes. (Inline styles still win over CSS; avoid
+     using inline style in markup for positioning.) */
+  html body .audio-player.fixed[style] {
+    right: 0;
+  }
+
+  /* Center the mobile-only progress bar (the container uses `md:hidden`)
+     Keep times at fixed size and let the input take a constrained centered width */
+  html body .audio-player.fixed .md\:hidden {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  html body .audio-player.fixed .md\:hidden > span {
+    flex: 0 0 auto;
+    min-width: 2.5rem;
+    text-align: center;
+  }
+
+  html body .audio-player.fixed .md\:hidden input[type="range"] {
+    flex: 0 1 auto;
+    width: min(60vw, 240px);
+    max-width: 70%;
+    height: 6px;
+  }
+
+  /* Center transport buttons and volume on mobile between the time texts */
+  /* Center the controls row under the mobile progress bar and constrain width
+     to match the progress input so the controls sit visually between the times. */
+  html body .audio-player.fixed .flex.items-center.gap-3.w-full.mt-1.md\:mt-0 {
+    justify-content: center;
+    width: min(60vw, 240px);
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Remove desktop left offsets on mobile so controls center properly */
+  html body .audio-player.fixed .-ml-1 { margin-left: 0; }
+  html body .audio-player.fixed .ml-11 { margin-left: 0; }
+
+  /* Keep transport and volume clusters from shrinking */
+  html body .audio-player.fixed .-ml-1,
+  html body .audio-player.fixed .ml-11 { flex: 0 0 auto; }
 }

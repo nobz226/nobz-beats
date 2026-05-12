@@ -99,7 +99,7 @@ export default function Nav() {
         {open ? '✕' : '☰'}
       </button>
 
-      <div className={`${open ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row gap-4 items-end lg:items-center bg-[#1c1c1c]/95 lg:bg-transparent p-6 lg:p-0 rounded-xl shadow-2xl lg:shadow-none border border-white/[0.05] lg:border-none backdrop-blur-lg lg:backdrop-blur-none z-[1101]`} onClick={onClick}>
+      <div className={`${open ? 'grid' : 'hidden'} lg:flex grid-cols-2 justify-items-center text-center lg:flex-row lg:gap-4 lg:items-center bg-[#1c1c1c]/95 lg:bg-transparent p-4 lg:p-0 rounded-none lg:rounded-none shadow-2xl lg:shadow-none border-none lg:border-none backdrop-blur-lg lg:backdrop-blur-none z-[1101] fixed lg:static inset-x-0 top-16 lg:top-auto lg:inset-x-auto w-full lg:w-auto gap-2`} onClick={onClick}>
         <a href="/singles" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.12s)'}}>&gt;Singles</a>
         <a href="/albums" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.24s)'}}>&gt;Albums</a>
         <a href="/remixes" className={navItemClass} style={{...navItemStyle, animationDelay: 'calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.36s)'}}>&gt;Remixes</a>

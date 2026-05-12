@@ -167,11 +167,6 @@ export default function TwoUpCarousel({ children = [], step = 2, className = '' 
           ))}
         </div>
       </div>
-
-      {/* Navigation arrows removed */}
-
-      {/* Progress Dots */}
-      {/* helper text and progress dots removed per request */}
     </div>
   )
 }

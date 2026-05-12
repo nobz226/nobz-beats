@@ -68,12 +68,33 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
 
       const navRect = nav.getBoundingClientRect()
 
-      // if viewport is narrow, let CSS media query stack playlist under the nav
+      // if viewport is narrow, position playlist starting from audio player's top
       if (window.innerWidth <= 1120) {
+        const player = document.querySelector('.audio-player')
+        const nav = document.querySelector('.site-nav')
+        if (player) {
+          const playerRect = player.getBoundingClientRect()
+          const bottomPos = window.innerHeight - playerRect.top
+          el.style.bottom = Math.round(bottomPos) + 'px'
+          el.style.top = 'auto'
+          el.style.height = 'auto'
+          
+          // Check if nav menu is open and adjust max height to avoid overlap
+          let maxHeight = '50vh'
+          if (nav) {
+            const navMenu = nav.querySelector('div[class*="flex"]')
+            if (navMenu && navMenu.offsetHeight > 0) {
+              // Nav menu is open, reduce playlist max height
+              const navMenuBottom = navMenu.getBoundingClientRect().bottom
+              const playerTop = playerRect.top
+              const availableHeight = Math.max(0, playerTop - navMenuBottom)
+              maxHeight = Math.min(availableHeight, window.innerHeight * 0.5) + 'px'
+            }
+          }
+          
+          el.style.maxHeight = maxHeight
+        }
         el.style.left = ''
-        el.style.top = ''
-        el.style.height = ''
-        el.style.maxHeight = ''
         return
       }
 
@@ -230,10 +251,25 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
         if (mobileBtn) {
           if (window.innerWidth <= 1120) {
             if (!visible) {
-              mobileBtn.style.left = ''
-              mobileBtn.style.top = ''
-              mobileBtn.style.right = '0.5rem'
-              mobileBtn.style.transform = ''
+              // On mobile when playlist is hidden, position button on top of player's top right corner
+              const player = document.querySelector('.audio-player')
+              if (player) {
+                const playerRect = player.getBoundingClientRect()
+                const btnW = mobileBtn.offsetWidth || 36
+                const btnH = mobileBtn.offsetHeight || 36
+                const right = Math.round(window.innerWidth - playerRect.right + 8) // 8px from player's right edge
+                const top = Math.round(playerRect.top - btnH - 4) // above player with 4px gap
+                mobileBtn.style.right = right + 'px'
+                mobileBtn.style.left = 'auto'
+                mobileBtn.style.top = top + 'px'
+                mobileBtn.style.transform = 'none'
+              } else {
+                // fallback if player not found
+                mobileBtn.style.left = ''
+                mobileBtn.style.right = '0.5rem'
+                mobileBtn.style.top = ''
+                mobileBtn.style.transform = ''
+              }
             } else if (el) {
               const rect = el.getBoundingClientRect()
               const btnW = mobileBtn.offsetWidth || 36
@@ -294,12 +330,12 @@ export default function Playlist({ tracks = [], onSelect, onAdd, onPlayPlaylist,
         title={visible ? 'Hide playlist' : 'Show playlist'}
         aria-label={visible ? 'Hide playlist' : 'Show playlist'}
         onClick={toggleVisible}
-        className={`flex lg:hidden fixed right-2 top-1/2 z-[1011] -translate-y-1/2 items-center justify-center bg-white/5 text-white rounded-md border border-white/[0.06] hover:bg-white/10 transition-all px-3 py-2 ${highlight ? 'ring-4 ring-white/30 pulse-highlight' : ''}`}
+        className={`flex lg:hidden fixed z-[1011] items-center justify-center bg-white/5 text-white rounded-md border border-white/[0.06] hover:bg-white/10 transition-all px-3 py-2 ${highlight ? 'ring-4 ring-white/30 pulse-highlight' : ''}`}
       >
         {visible ? (
           <span className="inline-block leading-[1.05] text-[0.9rem] font-bold font-cal-sans">Hide</span>
         ) : (
-          <span className="inline-block [writing-mode:vertical-rl] [text-orientation:mixed] leading-[1.05] text-[0.9rem] font-bold font-cal-sans">Playlist</span>
+          <span className="inline-block leading-[1.05] text-[0.9rem] font-bold font-cal-sans">Playlist</span>
         )}
       </button>
       <aside 

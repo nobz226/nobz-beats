@@ -18,7 +18,7 @@
 | 3 | Observe the page content | Artist biography text is displayed with `font-cutive`. Heading reads "About" in `font-cal-sans` |
 | 4 | Observe the stats cards | Two cards appear showing the track count (e.g., "3") and album count (e.g., "2") with labels "Tracks" and "Albums" |
 | 5 | Click the ">Connect" link in the navigation bar | URL changes to `/connect`. Page fades in with the entrance animation |
-| 6 | Observe the social media platform links | Six platform links are visible: SoundCloud, Spotify, YouTube, Instagram, Twitter/X, Bandcamp. Each shows an icon and platform name |
+| 6 | Observe the social media platform links | Three platform links are visible: SoundCloud, YouTube, Bandcamp. Each shows an icon and platform name |
 | 7 | Click the "SoundCloud" link | A new browser tab opens at the SoundCloud URL |
 | 8 | Locate the contact form on the Connect page | Three fields are visible: Name, Email, Message, plus a Submit button |
 | 9 | Fill in Name: "Jane Doe", Email: "jane@example.com", Message: "Love your tracks!" | All fields accept input without errors |

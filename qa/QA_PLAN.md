@@ -135,3 +135,78 @@
 - 3 bug reports documented with severity and reproduction steps
 - No P0 or P1 bugs open
 - Formspree submission works end-to-end (tested against live endpoint)
+
+---
+
+## 8. Development & Testing Schedule (5 Days)
+
+**Hours:** 10:00 – 19:00 each day (1h lunch break at 13:00–14:00)
+**Team:** Eduard Rotaru (Developer), Jess Wilson (Designer), QA Lead
+
+### Day 1 — Monday: Foundation & About Page
+
+| Time | Activity | Owner | Deliverable |
+|---|---|---|---|
+| 10:00–10:30 | Sprint kickoff: review ACs, wireframes, Convex data shape | All | Shared understanding, task breakdown |
+| 10:30–12:00 | Scaffold About component; draft bio content + stats cards markup | Developer | `About.jsx` with static structure |
+| 12:00–13:00 | Wire stats cards to Convex (track/album counts via props from `App.jsx`) | Developer | Live stats rendering |
+| 14:00–15:30 | Apply theme styles: dark surfaces, `font-cal-sans` / `font-cutive`, entrance animation | Designer | Themed About page |
+| 15:30–16:30 | Responsive layout — desktop and mobile breakpoints | Developer | Responsive About page |
+| 16:30–18:00 | Accessibility pass: labels, ARIA, keyboard nav, contrast | Developer | Screen-reader ready |
+| 18:00–19:00 | Self-review, squash bugs, push branch | Developer | PR-ready branch |
+
+### Day 2 — Tuesday: Connect Page
+
+| Time | Activity | Owner | Deliverable |
+|---|---|---|---|
+| 10:00–11:00 | Review Day 1 feedback; merge About branch to feature branch | Developer | Clean baseline |
+| 11:00–12:30 | Scaffold Connect component; social links grid + icon mapping | Developer | `Connect.jsx` with social links |
+| 12:30–13:00 | Wire social link URLs from config constant; `target="_blank"` + `rel` attributes | Developer | Links open in new tabs |
+| 14:00–16:00 | Build Formspree contact form: Name, Email, Message fields, validation, submit handler | Developer | Functional form |
+| 16:00–17:00 | Form UX states: idle, sending, success, error, field retention | Developer | Full form lifecycle |
+| 17:00–18:00 | Apply theme styles, responsive layout, entrance animation | Designer | Themed Connect page |
+| 18:00–19:00 | Update `App.jsx` to pass `trackCount` / `albumCount` to About | Developer | `App.jsx` updated |
+
+### Day 3 — Wednesday: Integration, Polish & Nav
+
+| Time | Activity | Owner | Deliverable |
+|---|---|---|---|
+| 10:00–11:00 | Fix active nav-link highlighting (BUG-02) | Developer | Nav highlights current route |
+| 11:00–12:30 | Fix desktop overflow scrolling on both pages (BUG-01) | Developer | Scrollable content at all breakpoints |
+| 12:30–13:00 | Fix form field retention on failure (BUG-03) | Developer | Fields preserved on error |
+| 14:00–15:30 | Cross-browser visual polish (Chrome, Firefox, Safari) | Designer | Consistent rendering |
+| 15:30–17:00 | Accessibility deep-dive: VoiceOver flow, focus order, error announcements | Designer | ARIA live regions on form |
+| 17:00–18:00 | Add `custom-scrollbar` class to desktop content areas | Developer | Consistent scrollbar style |
+| 18:00–19:00 | Code review preparation; inline docs for new components | Developer | Review-ready code |
+
+### Day 4 — Thursday: Testing & Bug Fixing
+
+| Time | Activity | Owner | Deliverable |
+|---|---|---|---|
+| 10:00–11:00 | Test discovery walkthrough — review TC-01, TC-02, TC-03 | All | Test run plan |
+| 11:00–13:00 | **TC-01 Happy Path** execution: full feature walkthrough (all 12 steps) | QA Lead | Pass/fail log |
+| 14:00–15:30 | **TC-02 Sad Path** execution: Convex unavailable, network failure, Formspree down | QA Lead | Pass/fail log |
+| 15:30–17:00 | **TC-03 Edge Cases** execution: empty catalogue, form validation, long text | QA Lead | Pass/fail log |
+| 17:00–18:00 | Bug triage and assignment of any P0/P1 failures | All | Bug tracker updated |
+| 18:00–19:00 | Fix high-severity bugs found during testing | Developer | Patches merged |
+
+### Day 5 — Friday: Regression, Release & Handover
+
+| Time | Activity | Owner | Deliverable |
+|---|---|---|---|
+| 10:00–11:00 | Regression test of unaffected pages (Latest, Singles, Albums, Player, Playlist) | QA Lead | Regression pass |
+| 11:00–12:30 | Re-test fixed bugs (BUG-01, BUG-02, BUG-03) | QA Lead | Verified fixes |
+| 12:30–13:00 | AC-15 cross-browser smoke test (Chrome, Firefox, Safari) | QA Lead | Cross-browser pass |
+| 14:00–15:00 | Performance check: page load times < 2s (AC-16) | Developer | Performance pass |
+| 15:00–16:00 | Final review against all acceptance criteria | All | Exit criteria met |
+| 16:00–17:00 | Merge feature branch → `main`; deploy to Vercel preview | Developer | Preview deployment |
+| 17:00–18:00 | Smoke test on Vercel preview URL | All | Production-equivalent green |
+| 18:00–19:00 | Release sign-off; update QA docs with results | All | Release complete |
+
+### Schedule Notes
+
+- **Stand-ups (10:00–10:15):** Quick daily sync on blockers and priorities.
+- **Lunch (13:00–14:00):** Mandatory disconnect — no commits or deployments.
+- **Bug response SLA:** P0 within 2 hours, P1 within 4 hours, P2/P3 within next day.
+- If Day 4 testing reveals P0 bugs, Day 5 morning is reallocated to fixing them; regression shifts to afternoon.
+- The Formspree endpoint must be configured and verified by end of Day 1 for form testing on Day 4.

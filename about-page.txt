@@ -1,0 +1,81 @@
+Eduard Rotaru
+
+HOME
+ABOUT
+PROJECTS
+CONTACT
+
+// ABOUT ME
+The Developer Behind the Code
+
+Skateboarder. Music producer. Full-stack developer. Every passion feeds the same obsession — relentless pursuit of quality and an eye for the invisible detail.
+
+// CORE VALUES
+What Drives My Work
+
+01
+The Art of Resilience
+
+One of my oldest and biggest passions is skateboarding. In that world, a trick isn't finished until it's landed cleanly. I apply this to web development by obsessing over the final user experience — viewing every bug as a necessary step toward perfect execution.
+
+02
+Uncompromising Detail
+
+Quality isn't an afterthought; it's the blueprint. With 9 years of experience in technical testing, I see the 'invisible' details — page speed, security, and responsive breaks — that others miss. My work is engineered to be unbreakable.
+
+03
+Intentional Craftsmanship
+
+I love making music. Much like producing a track, great web development requires a balance of structure and soul. I build scaffolded code that is organized and scalable, ensuring the backend logic supports a beautiful, rhythmic front-end experience.
+
+// DIFFERENTIATION
+How I Stand Apart
+
+I bridge the gap between technical rigor and creative expression. My unique edge is my efficiency: I use AI as a high-speed catalyst to handle the repetitive, predictable manual labor — under my strict supervision and review.
+
+This allows me to dedicate my cognitive energy to artistic details, custom animations, and strategic problem-solving that truly attract a client's audience. I offer the speed of modern technology paired with the soul and precision of a boutique craftsman.
+
+TECHNICAL RIGOR
+QA Discipline
+9yr Testing Exp.
+Production-Ready
+Performance-First
+
+CREATIVE SOUL
+Custom Animations
+Creative Design
+Artistic Intent
+Brand Identity
+
+// INTERNSHIP GOALS
+Seeking Internship Opportunities
+
+I'm actively pursuing internship opportunities with creative agencies, digital studios, and media companies in the new media field. My goal is to collaborate with teams that value both technical excellence and creative innovation.
+
+I'm particularly interested in roles where I can:
+- Build high-performance, aesthetically refined web experiences
+- Collaborate with designers, creative directors, and product teams
+- Work on real-world projects with measurable impact
+- Learn industry best practices and emerging technologies
+- Contribute to client projects for agencies and creative studios
+
+If you're looking for an internship candidate with strong technical foundations, a passion for design excellence, and the drive to deliver polished digital products, I'd love to discuss opportunities.
+
+// MISSION STATEMENT
+The Ongoing "Why"
+
+To transform complex ideas into high-fidelity web experiences through technical honesty and artistic intent, leveraging AI-accelerated workflows to deliver polished, resilient, and soul-driven digital products for clients and agencies alike.
+
+SOUL
+SYSTEMS
+AI-CATALYSIS
+
+Eduard Rotaru
+Full-Stack Developer
+
+HOME
+ABOUT
+PROJECTS
+CONTACT
+
+© 2026 Eduard Rotaru. Built with React + Vite.

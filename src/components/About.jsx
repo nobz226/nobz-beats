@@ -10,10 +10,10 @@ function SectionImage({ src, className = '' }) {
 
 function Section({ title, children, image = false, isMobile = false, imageSrc = '' }) {
   return (
-    <div className="mb-8">
+    <div>
       {image && (
         <div className={isMobile ? 'flex justify-center mb-4' : 'hidden'}>
-          <SectionImage src={imageSrc} className="w-full max-w-[200px] h-[200px]" />
+          <SectionImage src={imageSrc} className="w-full max-w-[280px] aspect-[4/5]" />
         </div>
       )}
       <h3 className="font-cal-sans font-bold text-[1.2rem] text-white mb-3">{title}</h3>
@@ -102,14 +102,14 @@ export default function About() {
       }}
       aria-label="About"
     >
-      <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-3 ${isMobile ? 'px-4 text-center' : ''}`}>About</h2>
+      <h2 className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-3 ${isMobile ? 'px-12 pr-6 text-center' : ''}`}>About</h2>
 
-      <div className={`flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar ${isMobile ? 'px-4 pb-24' : 'px-1'}`}>
+      <div className={`flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar ${isMobile ? 'px-12 pr-6 pb-24' : 'px-1'}`}>
         <div className={isMobile ? 'flex flex-col gap-8' : 'flex flex-col gap-10'}>
           {sections.map((section, i) => (
             <div key={section.title} className={!isMobile ? 'flex gap-6 items-start' : ''}>
               {!isMobile && (
-                <div className="flex-shrink-0 w-[200px]">
+                <div className="flex-shrink-0 w-[200px] mt-[2.95rem]">
                   <SectionImage src={section.image} className="w-full h-[220px]" />
                 </div>
               )}

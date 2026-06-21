@@ -101,22 +101,17 @@ export default function Connect() {
 
   return (
     <section
-      className={`latest-section fixed z-[1000] text-white opacity-0 translate-y-2 animate-section-fade ${isMobile ? "left-0 right-0 w-full flex flex-col overflow-hidden" : "p-0 custom-scrollbar"}`}
+      className={`latest-section fixed z-[1000] text-white opacity-0 translate-y-2 animate-section-fade left-0 lg:left-16 right-0 lg:right-[3.50rem] ${isMobile ? "w-full flex flex-col overflow-hidden" : "p-0 custom-scrollbar"}`}
       style={{
-        left: isMobile ? "0" : "var(--main-left)",
         top: isMobile ? "var(--main-top)" : "calc(var(--main-top) - 1rem)",
         bottom: isMobile ? "var(--player-bottom)" : "auto",
-        width: isMobile ? "100%" : "auto",
-        maxWidth: isMobile
-          ? "none"
-          : "var(--latest-maxwidth, calc(100% - (var(--logo-size) + var(--logo-gap) + 2rem)))",
         animationDelay:
           "calc(var(--logo-fade) + var(--title-fade) + var(--title-gap) + 0.72s)",
       }}
       aria-label='Connect'
     >
       <h2
-        className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 ${isMobile ? "px-4" : ""}`}
+        className={`font-cal-sans font-bold text-[1.75rem] m-0 mb-2 w-[calc(100%-2rem)] max-w-[48rem] mx-auto ${isMobile ? "px-4" : ""}`}
       >
         Connect
       </h2>
@@ -125,7 +120,7 @@ export default function Connect() {
         className={`font-cutive font-normal flex-1 overflow-x-hidden custom-scrollbar ${isMobile ? "overflow-y-auto px-4 pb-24" : ""}`}
       >
         <div
-          className={`flex items-center gap-3 mb-6 ${isMobile ? "px-4" : ""}`}
+          className={`flex items-center gap-3 mb-6 w-[calc(100%-2rem)] max-w-[48rem] mx-auto ${isMobile ? "px-4" : ""}`}
         >
           {SOCIAL_LINKS.map((link) => (
             <a
@@ -149,58 +144,62 @@ export default function Connect() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className={`max-w-md flex flex-col gap-4 ${isMobile ? "px-4" : ""}`}
+          className={`w-[calc(100%-2rem)] max-w-[48rem] mx-auto flex flex-col gap-4 ${isMobile ? "px-4" : ""}`}
           aria-busy={isSending}
         >
-          <label className='block'>
-            <span className='block text-sm font-medium mb-1 opacity-80'>
-              Name
-            </span>
-            <input
-              name='name'
-              type='text'
-              value={formData.name}
-              onChange={handleChange}
-              disabled={isSending}
-              aria-invalid={!!errors.name}
-              aria-describedby={errors.name ? "connect-name-error" : undefined}
-              className={inputClass(!!errors.name)}
-            />
-            {errors.name && (
-              <span
-                id='connect-name-error'
-                className='block mt-1 text-xs text-red-400'
-              >
-                {errors.name}
+          <div className='grid sm:grid-cols-2 gap-4'>
+            <label className='block'>
+              <span className='block text-sm font-medium mb-1 opacity-80'>
+                Name
               </span>
-            )}
-          </label>
+              <input
+                name='name'
+                type='text'
+                value={formData.name}
+                onChange={handleChange}
+                disabled={isSending}
+                aria-invalid={!!errors.name}
+                aria-describedby={
+                  errors.name ? "connect-name-error" : undefined
+                }
+                className={inputClass(!!errors.name)}
+              />
+              {errors.name && (
+                <span
+                  id='connect-name-error'
+                  className='block mt-1 text-xs text-red-400'
+                >
+                  {errors.name}
+                </span>
+              )}
+            </label>
 
-          <label className='block'>
-            <span className='block text-sm font-medium mb-1 opacity-80'>
-              Email
-            </span>
-            <input
-              name='email'
-              type='email'
-              value={formData.email}
-              onChange={handleChange}
-              disabled={isSending}
-              aria-invalid={!!errors.email}
-              aria-describedby={
-                errors.email ? "connect-email-error" : undefined
-              }
-              className={inputClass(!!errors.email)}
-            />
-            {errors.email && (
-              <span
-                id='connect-email-error'
-                className='block mt-1 text-xs text-red-400'
-              >
-                {errors.email}
+            <label className='block'>
+              <span className='block text-sm font-medium mb-1 opacity-80'>
+                Email
               </span>
-            )}
-          </label>
+              <input
+                name='email'
+                type='email'
+                value={formData.email}
+                onChange={handleChange}
+                disabled={isSending}
+                aria-invalid={!!errors.email}
+                aria-describedby={
+                  errors.email ? "connect-email-error" : undefined
+                }
+                className={inputClass(!!errors.email)}
+              />
+              {errors.email && (
+                <span
+                  id='connect-email-error'
+                  className='block mt-1 text-xs text-red-400'
+                >
+                  {errors.email}
+                </span>
+              )}
+            </label>
+          </div>
 
           <label className='block'>
             <span className='block text-sm font-medium mb-1 opacity-80'>

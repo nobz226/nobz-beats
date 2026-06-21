@@ -21,7 +21,7 @@
 | ID | Criterion | Type |
 |---|---|---|
 | AC-01 | Page displays the artist biography text content | Functional |
-| AC-02 | Page shows live discography statistics (track count, album count) pulled from the Convex database | Functional |
+| AC-02 | Page shows live discography statistics (track count, album count) pulled from the Convex database | Functional | (not going to implement)
 | AC-03 | Page matches the app's existing visual theme (dark background, `font-cal-sans` headings, `font-cutive` body, entrance fade animation) | UI |
 | AC-04 | Page is responsive: stacks vertically on mobile (<= 1024px) with the same layout pattern as other pages | Responsive |
 | AC-05 | Page scroll its content independently if it overflows (custom scrollbar) | Functional |

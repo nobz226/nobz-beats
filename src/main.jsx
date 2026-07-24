@@ -6,7 +6,7 @@ import { ConvexReactClient, ConvexProvider } from 'convex/react'
 // Import the project's existing stylesheet to keep visual parity
 import '../css/styles.css'
 
-const convexUrl = import.meta.env.VITE_CONVEX_URL || process.env.REACT_APP_CONVEX_URL || ''
+const convexUrl = import.meta.env.VITE_CONVEX_URL || (typeof process !== 'undefined' && process.env && process.env.REACT_APP_CONVEX_URL) || ''
 console.debug('[Convex] using URL:', convexUrl)
 const convexClient = new ConvexReactClient(convexUrl)
 

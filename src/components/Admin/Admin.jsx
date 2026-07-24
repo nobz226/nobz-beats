@@ -18,8 +18,8 @@ export default function Admin() {
   }, [])
   React.useEffect(() => { console.debug('[Admin] authed changed ->', authed) }, [authed])
 
-  const ADMIN_USER = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ADMIN_USER) || process.env.REACT_APP_ADMIN_USER || 'admin'
-  const ADMIN_PWD = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ADMIN_PASSWORD) || process.env.REACT_APP_ADMIN_PASSWORD || 'admin'
+  const ADMIN_USER = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ADMIN_USER) || (typeof process !== 'undefined' && process.env && process.env.REACT_APP_ADMIN_USER) || 'admin'
+  const ADMIN_PWD = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ADMIN_PASSWORD) || (typeof process !== 'undefined' && process.env && process.env.REACT_APP_ADMIN_PASSWORD) || 'admin'
 
   const login = (e) => {
     e.preventDefault()
@@ -42,7 +42,7 @@ export default function Admin() {
 
   if (!authed) {
     return (
-      <main className="p-8 max-w-md mx-auto mt-20 bg-white/[0.03] rounded-lg">
+      <main className="p-8 max-w-md mx-auto mt-20 bg-white/[0.03] rounded-lg h-screen overflow-y-auto">
         <h2 className="text-2xl font-bold mb-6 font-cal-sans">Admin Login</h2>
         <form onSubmit={login}>
           <label className="block mb-4">
@@ -74,7 +74,7 @@ export default function Admin() {
   }
 
   return (
-    <main className="p-8 max-w-6xl mx-auto mt-20">
+    <main className="p-8 max-w-6xl mx-auto mt-20 h-screen overflow-y-auto">
       <header className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
         <h2 className="text-2xl font-bold font-cal-sans">Admin {username ? `— ${username}` : ''}</h2>
         <div className="flex gap-2">

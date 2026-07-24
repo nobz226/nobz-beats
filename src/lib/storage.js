@@ -16,16 +16,16 @@ export async function uploadToStorage(file) {
   const convexBase = getConvexBase()
   if (!convexBase) throw new Error('Convex site URL not configured for uploads')
 
-  const isImage = file.type && file.type.startsWith('image/')
-  const isAudio = file.type && file.type.startsWith('audio/')
+  const nameExt = (file.name || '').toLowerCase()
+  const isImage = (file.type && file.type.startsWith('image/')) || /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico|avif)$/i.test(nameExt)
+  const isAudio = (file.type && file.type.startsWith('audio/')) || /\.(mp3|wav|wave|flac|aac|ogg|wma|m4a|aiff|aif|opus)$/i.test(nameExt)
   const endpoint = isImage ? '/upload/artwork' : isAudio ? '/upload/audio' : null
   if (!endpoint) throw new Error('Unknown file type; only image/* and audio/* are supported')
 
-  const url = `${convexBase.replace(/\/$/, '')}${endpoint}`
-  const fd = new FormData()
-  fd.append('file', file, file.name)
+  const params = new URLSearchParams({ name: file.name })
+  const url = `${convexBase.replace(/\/$/, '')}${endpoint}?${params}`
 
-  const res = await fetch(url, { method: 'POST', body: fd })
+  const res = await fetch(url, { method: 'POST', body: file })
   let json
   try { json = await res.json() } catch (e) { throw new Error('Upload failed: invalid JSON response') }
   if (!res.ok) throw new Error(json?.error || `Upload failed: ${res.status}`)

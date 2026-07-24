@@ -4,13 +4,21 @@
 
 import { httpAction } from './_generated/server.js'
 
+// Extract a filename from a URL query (?name=) or fall back to a default.
+function getFilename(req) {
+  try {
+    const url = new URL(req.url)
+    const q = url.searchParams?.get?.('name')
+    if (q) return q
+  } catch (_) {}
+  return 'file'
+}
+
 // helpers to read multipart form via Request.formData()
 async function readMultipartBody(req) {
   const contentType = req.headers?.get?.('content-type') || ''
-  console.log('[readMultipartBody] contentType:', contentType)
 
   if (contentType.startsWith('multipart/')) {
-    // Handle multipart/form-data
     try {
       const form = await req.formData()
       const file = form.get('file')
@@ -23,20 +31,19 @@ async function readMultipartBody(req) {
     } catch (e) {
       console.log('[readMultipartBody] formData failed:', e.message)
     }
-  } else {
-    // Handle raw bytes with headers
-    console.log('[readMultipartBody] trying raw arrayBuffer')
-    try {
-      const arrayBuffer = await req.arrayBuffer()
-      console.log('[readMultipartBody] arrayBuffer length:', arrayBuffer.byteLength)
+    return { fileBuffer: null, fileInfo: null }
+  }
+
+  // Handle raw bytes (no custom headers needed — filename comes from URL)
+  try {
+    const arrayBuffer = await req.arrayBuffer()
+    if (arrayBuffer && arrayBuffer.byteLength > 0) {
       const fileBuffer = new Uint8Array(arrayBuffer)
-      const filename = req.headers?.get?.('x-filename') || 'file'
-      const mimeType = contentType || 'application/octet-stream'
-      const fileInfo = { filename, mimeType }
+      const fileInfo = { filename: getFilename(req), mimeType: contentType || 'application/octet-stream' }
       return { fileBuffer, fileInfo }
-    } catch (err) {
-      console.log('[readMultipartBody] arrayBuffer failed:', err.message)
     }
+  } catch (err) {
+    console.log('[readMultipartBody] arrayBuffer failed:', err.message)
   }
 
   return { fileBuffer: null, fileInfo: null }
@@ -49,8 +56,7 @@ function corsHeaders() {
   return {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    // include X-Filename so preflight responses allow raw uploads from non-browser clients
-    'Access-Control-Allow-Headers': 'Content-Type, Accept, X-Filename',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept',
     'Access-Control-Max-Age': '86400'
   }
 }
@@ -74,8 +80,10 @@ export const uploadArtwork = httpAction(async ({ storage }, request) => {
 
     console.log('[uploadArtwork] fileInfo:', fileInfo, 'bufferLength:', fileBuffer?.byteLength ?? fileBuffer?.length)
 
-    // simple validation
-    if (!fileInfo.mimeType.startsWith('image/')) return jsonResponse({ error: 'invalid type' }, 400)
+    // simple validation (fallback to extension when mime is unknown)
+    const ext = (fileInfo.filename || '').toLowerCase()
+    const isImg = fileInfo.mimeType.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico|avif)$/i.test(ext)
+    if (!isImg) return jsonResponse({ error: 'invalid type' }, 400)
     if ((fileBuffer.byteLength || fileBuffer.length) > MAX_IMAGE) return jsonResponse({ error: 'file too large' }, 413)
 
     const name = `artwork/${Date.now()}-${fileInfo.filename}`
@@ -107,8 +115,10 @@ export const uploadAudio = httpAction(async ({ storage }, request) => {
 
     console.log('[uploadAudio] fileInfo:', fileInfo, 'bufferLength:', fileBuffer?.byteLength ?? fileBuffer?.length)
 
-    // validate mime types for audio
-    if (!fileInfo.mimeType.startsWith('audio/')) return jsonResponse({ error: 'invalid type' }, 400)
+    // validate mime types for audio (fallback to extension when mime is unknown)
+    const ext2 = (fileInfo.filename || '').toLowerCase()
+    const isAud = fileInfo.mimeType.startsWith('audio/') || /\.(mp3|wav|wave|flac|aac|ogg|wma|m4a|aiff|aif|opus)$/i.test(ext2)
+    if (!isAud) return jsonResponse({ error: 'invalid type' }, 400)
     if ((fileBuffer.byteLength || fileBuffer.length) > MAX_AUDIO) return jsonResponse({ error: 'file too large' }, 413)
 
     const name = `audio/${Date.now()}-${fileInfo.filename}`
